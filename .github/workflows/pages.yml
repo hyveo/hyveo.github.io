@@ -1,0 +1,77 @@
+name: Publish HYVEO Projects
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    env:
+      GOOGLE_ADSENSE_CLIENT: ${{ vars.GOOGLE_ADSENSE_CLIENT }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/configure-pages@v5
+
+      - name: Build static site
+        run: |
+          mkdir -p dist
+
+          python3 - <<'PY'
+          import html
+          import os
+          from pathlib import Path
+
+          client = os.environ.get("GOOGLE_ADSENSE_CLIENT", "").strip()
+          adsense_head = ""
+
+          if client:
+              escaped = html.escape(client, quote=True)
+              adsense_head = f'''<meta name="google-adsense-account" content="{escaped}" />
+              <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={escaped}" crossorigin="anonymous"></script>'''
+
+          template = Path("index.template.html").read_text(encoding="utf-8")
+          Path("dist/index.html").write_text(
+              template.replace("{{GOOGLE_ADSENSE_HEAD}}", adsense_head),
+              encoding="utf-8",
+          )
+
+          if client.startswith("ca-pub-"):
+              publisher_id = client.removeprefix("ca-")
+              Path("dist/ads.txt").write_text(
+                  f"google.com, {publisher_id}, DIRECT, f08c47fec0942fa0\n",
+                  encoding="utf-8",
+              )
+
+          Path("dist/robots.txt").write_text(
+              "User-agent: *\nAllow: /\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
