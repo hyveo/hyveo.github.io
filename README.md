@@ -6,9 +6,9 @@ https://hyveo.github.io/
 
 ## Projects
 
-### YouTube Daily Archive
+### Daily AI Insight
 
 12시에 만나요 YouTube 플레이리스트를 날짜별로 정리하고, 영상별 AI 요약 리포트를 제공하는 정적 아카이브입니다.
 
-- Site: https://hyveo.github.io/youtube_daily_archive_pages/
-- Repository: https://github.com/hyveo/youtube_daily_archive_pages
+- Site: https://hyveo.github.io/daily-ai-insight/
+- Repository: https://github.com/hyveo/daily-ai-insight
