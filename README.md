@@ -7,6 +7,7 @@ https://hyveo.github.io/
 ## Projects
 
 ### Daily AI Insight
+<img width="1200" height="630" alt="download" src="https://github.com/user-attachments/assets/8bec0e3c-488e-4721-ba96-c668f7f214a9" />
 
 12시에 만나요 YouTube 플레이리스트를 날짜별로 정리하고, 영상별 AI 요약 리포트를 제공하는 정적 아카이브입니다.
 
