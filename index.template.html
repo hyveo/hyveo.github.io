@@ -3,66 +3,1188 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    {{GOOGLE_ADSENSE_HEAD}}
+    <!-- GOOGLE_ADSENSE_HEAD -->
+    <!-- GOOGLE_ANALYTICS_HEAD -->
     <title>HYVEO Projects</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23246bfe'/%3E%3Cpath d='M10 50 30 14l24 36H10Z' fill='%23f4c24f'/%3E%3Cpath d='M10 50h44L32 32 10 50Z' fill='%230f9f7a'/%3E%3Cpath d='M30 14 54 50V14H30Z' fill='%23e46b4f'/%3E%3C/svg%3E"
+    />
+    <meta
+      name="description"
+      content="HYVEO가 만든 토이 프로젝트와 공개 웹 서비스를 한 곳에서 살펴보는 프로젝트 허브입니다."
+    />
+    <meta property="og:site_name" content="HYVEO Projects" />
+    <meta property="og:title" content="HYVEO Projects" />
+    <meta
+      property="og:description"
+      content="AI 인사이트, 생일 컬러칩, 오늘의 영수증까지 HYVEO의 작은 웹 서비스를 모았습니다."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://hyveo.github.io/" />
     <style>
+      :root {
+        color-scheme: light;
+        --bg: #f3f4f1;
+        --surface: #ffffff;
+        --surface-soft: #f8f7f0;
+        --ink: #202225;
+        --muted: #68706a;
+        --line: #dedfd8;
+        --green: #367842;
+        --green-soft: #e8f2e7;
+        --blue: #3567b7;
+        --yellow: #e7c84f;
+        --red: #d75a43;
+        --grid-line: rgba(32, 34, 37, 0.035);
+        --header-bg: rgba(243, 244, 241, 0.86);
+        --shadow: 0 20px 60px rgba(32, 34, 37, 0.08);
+        --mono:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        --sans:
+          system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
       body {
         margin: 0;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: #f7f7fb;
-        color: #111827;
+        background:
+          linear-gradient(var(--grid-line) 1px, transparent 1px),
+          linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+          var(--bg);
+        background-size: 34px 34px;
+        color: var(--ink);
+        font-family: var(--sans);
+        line-height: 1.65;
       }
 
-      main {
-        max-width: 960px;
-        margin: 0 auto;
-        padding: 56px 20px;
+      body[data-theme="dark"] {
+        color-scheme: dark;
+        --bg: #151713;
+        --surface: #20231f;
+        --surface-soft: #191d18;
+        --ink: #f3f5ed;
+        --muted: #aab2a8;
+        --line: #343a32;
+        --green: #7fbd7b;
+        --green-soft: #21301f;
+        --blue: #91b5ef;
+        --yellow: #d7bf5b;
+        --red: #d66a58;
+        --grid-line: rgba(255, 255, 255, 0.045);
+        --header-bg: rgba(21, 23, 19, 0.88);
+        --shadow: 0 20px 60px rgba(0, 0, 0, 0.26);
       }
 
-      h1 {
-        margin: 0 0 12px;
-        font-size: 42px;
-      }
-
-      .lead {
-        margin: 0 0 32px;
-        color: #4b5563;
-        line-height: 1.7;
-      }
-
-      .project {
-        display: block;
-        padding: 24px;
-        border: 1px solid #e5e7eb;
-        border-radius: 16px;
-        background: #ffffff;
+      a {
         color: inherit;
+      }
+
+      img,
+      video {
+        display: block;
+        max-width: 100%;
+      }
+
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        border-bottom: 1px solid var(--line);
+        background: var(--header-bg);
+        backdrop-filter: blur(18px);
+      }
+
+      .nav,
+      .section-inner,
+      .footer-inner {
+        width: min(920px, calc(100% - 40px));
+        margin: 0 auto;
+      }
+
+      .nav {
+        min-height: 66px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        font-family: var(--mono);
+        font-size: 14px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--green);
+        font-weight: 800;
         text-decoration: none;
       }
 
-      .project h2 {
-        margin: 0 0 8px;
+      .brand-mark {
+        width: 38px;
+        height: 10px;
+        border-radius: 2px;
+        background: linear-gradient(
+          90deg,
+          var(--green) 0 10px,
+          transparent 10px 14px,
+          var(--yellow) 14px 24px,
+          transparent 24px 28px,
+          var(--red) 28px 38px
+        );
       }
 
-      .project p {
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .nav-links a {
+        padding: 8px 10px;
+        border-radius: 6px;
+        color: var(--muted);
+        text-decoration: none;
+      }
+
+      .nav-links a:hover {
+        background: var(--surface);
+        color: var(--ink);
+      }
+
+      .nav-links a:last-child {
+        background: var(--green);
+        color: #ffffff;
+        font-weight: 800;
+      }
+
+      .theme-toggle {
+        min-width: 38px;
+        height: 38px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: var(--surface);
+        color: var(--ink);
+        cursor: pointer;
+        font-family: var(--mono);
+        font-weight: 800;
+      }
+
+      .hero {
+        padding: 82px 0 44px;
+      }
+
+      .hero-grid {
+        width: min(920px, calc(100% - 40px));
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(330px, 0.92fr);
+        gap: 64px;
+        align-items: center;
+      }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        margin: 0 0 26px;
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 14px;
+      }
+
+      .status::before {
+        content: "";
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        background: var(--green);
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: var(--blue);
+        font-family: var(--mono);
+        font-size: 16px;
+      }
+
+      h1,
+      h2,
+      h3 {
+        letter-spacing: 0;
+      }
+
+      h1 {
         margin: 0;
-        color: #4b5563;
-        line-height: 1.6;
+        max-width: 620px;
+        font-size: 58px;
+        line-height: 1.08;
+      }
+
+      .accent {
+        color: var(--green);
+      }
+
+      .lead {
+        margin: 28px 0 0;
+        max-width: 580px;
+        color: var(--muted);
+        font-size: 18px;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 28px;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 18px;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+        font-family: var(--mono);
+        font-size: 14px;
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      .button-primary {
+        border-color: var(--green);
+        background: var(--green);
+        color: #ffffff;
+      }
+
+      .button-secondary {
+        background: var(--surface);
+        color: var(--ink);
+      }
+
+      .hero-visual {
+        display: grid;
+        gap: 14px;
+      }
+
+      .terminal {
+        overflow: hidden;
+        border: 1px solid #22252a;
+        border-radius: 8px;
+        background: #111318;
+        color: #e6eee7;
+        box-shadow: var(--shadow);
+      }
+
+      .terminal-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 42px;
+        padding: 0 14px;
+        background: #1d2027;
+        color: #9ba59f;
+        font-family: var(--mono);
+        font-size: 13px;
+      }
+
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+
+      .dot-red {
+        background: #ef5b4f;
+      }
+
+      .dot-yellow {
+        background: #f0b84a;
+      }
+
+      .dot-green {
+        background: #4fbd68;
+        margin-right: 8px;
+      }
+
+      .terminal-body {
+        min-height: 164px;
+        padding: 22px;
+        font-family: var(--mono);
+        font-size: 15px;
+      }
+
+      .prompt {
+        color: #6fdb77;
+      }
+
+      .cursor {
+        display: inline-block;
+        width: 10px;
+        height: 18px;
+        margin-left: 3px;
+        background: #e6eee7;
+        vertical-align: -3px;
+        animation: blink 1s steps(2, start) infinite;
+      }
+
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      .commit-list {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+
+      .panel-title {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--line);
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 13px;
+      }
+
+      .commit-row {
+        display: grid;
+        grid-template-columns: 70px 1fr auto;
+        gap: 12px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--line);
+        font-family: var(--mono);
+        font-size: 13px;
+      }
+
+      .commit-row:last-child {
+        border-bottom: 0;
+      }
+
+      .hash {
+        color: var(--blue);
+      }
+
+      .time {
+        color: var(--muted);
+      }
+
+      .activity {
+        padding: 42px 0 34px;
+      }
+
+      .activity-panel {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--surface) 74%, transparent);
+        box-shadow: var(--shadow);
+      }
+
+      .activity-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 20px 24px 0;
+        font-family: var(--mono);
+      }
+
+      .activity-head strong {
+        color: var(--green);
+      }
+
+      .heatmap {
+        display: grid;
+        grid-template-columns: repeat(28, 12px);
+        gap: 6px;
+        padding: 24px;
+      }
+
+      .heatmap i {
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+        background: color-mix(in srgb, var(--muted) 18%, transparent);
+      }
+
+      .heatmap i:nth-child(3n) {
+        background: #a7d18f;
+      }
+
+      .heatmap i:nth-child(4n) {
+        background: #5d9d5b;
+      }
+
+      .heatmap i:nth-child(7n) {
+        background: #22252a;
+      }
+
+      .heatmap i:nth-child(11n) {
+        background: #d9c45d;
+      }
+
+      .projects {
+        padding: 46px 0 88px;
+      }
+
+      .section-heading {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 26px;
+        font-family: var(--mono);
+      }
+
+      .section-heading h2 {
+        margin: 0;
+        font-size: 22px;
+      }
+
+      .section-heading p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .project-filters {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 6px;
+      }
+
+      .filter-button {
+        min-height: 34px;
+        padding: 0 10px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: var(--surface);
+        color: var(--muted);
+        cursor: pointer;
+        font-family: var(--mono);
+      }
+
+      .filter-button.is-active {
+        border-color: var(--green);
+        background: var(--green);
+        color: #ffffff;
+        font-weight: 800;
+      }
+
+      .project-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .project-card {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--surface) 82%, transparent);
+        transition:
+          border-color 180ms ease,
+          opacity 180ms ease,
+          transform 180ms ease;
+      }
+
+      .project-card:hover {
+        border-color: var(--green);
+        transform: translateY(-3px);
+      }
+
+      .project-card.is-hidden {
+        display: none;
+      }
+
+      .project-empty {
+        display: none;
+        min-height: 180px;
+        align-items: center;
+        justify-content: center;
+        border: 1px dashed var(--line);
+        border-radius: 8px;
+        color: var(--muted);
+        font-family: var(--mono);
+        text-align: center;
+      }
+
+      .project-empty.is-visible {
+        display: flex;
+      }
+
+      .project-media {
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        padding: 14px 14px 0;
+        background: var(--surface-soft);
+      }
+
+      .project-media img,
+      .project-media video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top;
+        border: 1px solid var(--line);
+        border-bottom: 0;
+        border-radius: 8px 8px 0 0;
+        background: #ffffff;
+      }
+
+      .project-body {
+        display: flex;
+        min-height: 220px;
+        flex-direction: column;
+        padding: 20px;
+      }
+
+      .project-topline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+        font-family: var(--mono);
+        font-size: 13px;
+      }
+
+      .badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .badge {
+        padding: 5px 8px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: var(--surface);
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 12px;
+      }
+
+      .badge-live {
+        border-color: #cfe6cf;
+        background: var(--green-soft);
+        color: var(--green);
+      }
+
+      .project-card h3 {
+        margin: 0;
+        color: var(--blue);
+        font-family: var(--mono);
+        font-size: 22px;
+      }
+
+      .project-card p {
+        margin: 12px 0 0;
+        color: var(--muted);
+      }
+
+      .project-links {
+        display: flex;
+        margin-top: auto;
+        padding-top: 20px;
+      }
+
+      .project-links a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 36px;
+        padding: 0 12px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: var(--surface);
+        font-family: var(--mono);
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      .readme {
+        padding: 72px 0 90px;
+      }
+
+      .readme-card {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--surface) 82%, transparent);
+        box-shadow: var(--shadow);
+      }
+
+      .readme-body {
+        display: grid;
+        grid-template-columns: 1fr 310px;
+        gap: 28px;
+        padding: 30px;
+      }
+
+      .readme h2 {
+        margin: 0 0 8px;
+        font-size: 28px;
+      }
+
+      .readme p {
+        margin: 10px 0 0;
+        color: var(--muted);
+      }
+
+      .info-box,
+      .log-box {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface-soft);
+        padding: 16px;
+        font-family: var(--mono);
+        font-size: 13px;
+      }
+
+      .info-box {
+        display: grid;
+        gap: 8px;
+      }
+
+      .info-box b,
+      .log-box b {
+        color: #b66b26;
+      }
+
+      .stack {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 18px;
+      }
+
+      .stack span {
+        padding: 5px 8px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: var(--surface);
+        color: var(--blue);
+        font-family: var(--mono);
+        font-size: 13px;
+      }
+
+      .site-footer {
+        padding: 34px 0 48px;
+        border-top: 1px solid var(--line);
+        background: color-mix(in srgb, var(--surface) 52%, transparent);
+      }
+
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 13px;
+      }
+
+      .footer-inner a {
+        color: var(--green);
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      @media (max-width: 980px) {
+        .hero-grid,
+        .readme-body {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-grid {
+          gap: 34px;
+        }
+
+        .project-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .heatmap {
+          grid-template-columns: repeat(18, 12px);
+        }
+      }
+
+      @media (max-width: 720px) {
+        .nav,
+        .section-inner,
+        .footer-inner,
+        .hero-grid {
+          width: min(100% - 28px, 920px);
+        }
+
+        .nav-links a:not(:last-child) {
+          display: none;
+        }
+
+        .hero {
+          padding: 54px 0 28px;
+        }
+
+        h1 {
+          font-size: 42px;
+        }
+
+        .lead {
+          font-size: 17px;
+        }
+
+        .hero-actions,
+        .section-heading,
+        .footer-inner {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .button {
+          width: 100%;
+        }
+
+        .commit-row {
+          grid-template-columns: 58px 1fr;
+        }
+
+        .commit-row .time {
+          display: none;
+        }
+
+        .heatmap {
+          grid-template-columns: repeat(14, 12px);
+          gap: 5px;
+        }
+
+        .projects,
+        .readme {
+          padding: 58px 0;
+        }
+
+        .project-body {
+          min-height: auto;
+        }
+
+        .readme-body {
+          padding: 22px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        .cursor {
+          animation: none;
+        }
       }
     </style>
   </head>
   <body>
-    <main>
-      <h1>HYVEO Projects</h1>
-      <p class="lead">HYVEO Projects</p>
+    <header class="site-header">
+      <nav class="nav" aria-label="주요 메뉴">
+        <a
+          class="brand"
+          href="https://hyveo.github.io/"
+          data-ga-event="nav_click"
+          data-ga-section="header"
+          data-ga-label="brand_home"
+        >
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>~/hyveo</span>
+        </a>
+        <div class="nav-links">
+          <a href="#projects" data-ga-event="nav_click" data-ga-section="header" data-ga-label="projects">
+            projects
+          </a>
+          <a href="#readme" data-ga-event="nav_click" data-ga-section="header" data-ga-label="readme">
+            about
+          </a>
+          <button class="theme-toggle" type="button" data-theme-toggle aria-label="다크 모드 전환">☾</button>
+          <a href="#contact" data-ga-event="nav_click" data-ga-section="header" data-ga-label="contact">
+            contact
+          </a>
+        </div>
+      </nav>
+    </header>
 
-      <a class="project" href="https://hyveo.github.io/daily-ai-insight/">
-        <h2>Daily AI Insight</h2>
-        <p>
-          12시에 만나요 YouTube 플레이리스트를 날짜별로 정리하고,
-          영상별 AI 요약 리포트를 제공하는 정적 아카이브입니다.
-        </p>
-      </a>
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-grid">
+          <div>
+            <p class="status">available for tiny web experiments</p>
+            <p class="eyebrow">const me = {</p>
+            <h1 id="hero-title">토이 메이커,<br /><span class="accent">코딩이 취미인</span> hyveo</h1>
+            <p class="eyebrow">}</p>
+            <p class="lead">
+              필요해서 만들고, 재미있어서 계속 손보는 작은 웹 서비스를 모았습니다.
+              로그인 없이 바로 열리는 정적 웹을 좋아합니다.
+            </p>
+            <div class="hero-actions" aria-label="빠른 이동">
+              <a
+                class="button button-primary"
+                href="#projects"
+                data-ga-event="cta_click"
+                data-ga-section="hero"
+                data-ga-label="view_projects"
+              >
+                view projects ->
+              </a>
+              <a
+                class="button button-secondary"
+                href="mailto:app.hyveo@gmail.com"
+                data-ga-event="contact_click"
+                data-ga-section="hero"
+                data-ga-label="email"
+              >
+                contact
+              </a>
+            </div>
+          </div>
+
+          <div class="hero-visual" aria-label="HYVEO 활동 미리보기">
+            <div class="terminal">
+              <div class="terminal-bar">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+                <span>~/projects</span>
+              </div>
+              <div class="terminal-body">
+                <div><span class="prompt">&gt;</span> git log --oneline -5</div>
+                <div><span class="prompt">&gt;</span> open daily-ai-insight</div>
+                <div><span class="prompt">&gt;</span> open birthday-color-palatte</div>
+                <div><span class="prompt">&gt;</span> open today-receipt<span class="cursor"></span></div>
+              </div>
+            </div>
+            <div class="commit-list">
+              <div class="panel-title">recent commits</div>
+              <div class="commit-row">
+                <span class="hash">a3f8c21</span>
+                <span>feat: 서비스 허브 랜딩 정리</span>
+                <span class="time">now</span>
+              </div>
+              <div class="commit-row">
+                <span class="hash">b19de04</span>
+                <span>fix: 모바일 레이아웃 다듬기</span>
+                <span class="time">1d ago</span>
+              </div>
+              <div class="commit-row">
+                <span class="hash">c72af15</span>
+                <span>chore: 토이 프로젝트 모으기</span>
+                <span class="time">2d ago</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="activity" aria-label="활동 요약">
+        <div class="section-inner">
+          <div class="activity-panel">
+            <div class="activity-head">
+              <span>contributions this year</span>
+              <strong>3 live projects</strong>
+            </div>
+            <div class="heatmap" aria-hidden="true">
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="projects" id="projects" aria-labelledby="projects-title">
+        <div class="section-inner">
+          <div class="section-heading">
+            <h2 id="projects-title">~/projects</h2>
+            <div class="project-filters" aria-label="프로젝트 필터">
+              <button class="filter-button is-active" type="button" data-filter="all">all</button>
+              <button class="filter-button" type="button" data-filter="active">active</button>
+              <button class="filter-button" type="button" data-filter="wip">wip</button>
+            </div>
+          </div>
+
+          <div class="project-grid">
+            <article class="project-card" data-status="active">
+              <div class="project-body">
+                <div class="project-topline">
+                  <div class="badge-row">
+                    <span class="badge badge-live">active</span>
+                    <span class="badge">AI Report</span>
+                  </div>
+                  <span>★ 31</span>
+                </div>
+                <h3>daily-ai-insight</h3>
+                <p>
+                  YouTube 방송 콘텐츠를 AI 분석 리포트로 재구성해 핵심 주제와 관전 포인트를
+                  빠르게 읽을 수 있게 정리합니다.
+                </p>
+                <div class="stack">
+                  <span>#ai</span>
+                  <span>#youtube</span>
+                  <span>#report</span>
+                </div>
+                <div class="project-links">
+                  <a
+                    href="https://hyveo.github.io/daily-ai-insight/"
+                    data-ga-event="project_open"
+                    data-ga-section="projects"
+                    data-ga-project="Daily AI Insight"
+                    data-ga-label="service"
+                  >
+                    서비스 열기
+                  </a>
+                </div>
+              </div>
+            </article>
+
+            <article class="project-card" data-status="active">
+              <div class="project-body">
+                <div class="project-topline">
+                  <div class="badge-row">
+                    <span class="badge badge-live">active</span>
+                    <span class="badge">Color Utility</span>
+                  </div>
+                  <span>★ 18</span>
+                </div>
+                <h3>birthday-color-palatte</h3>
+                <p>
+                  생일을 입력하면 나만의 Birthday Color chip을 보여주는 모바일 중심의 컬러
+                  제너레이터입니다.
+                </p>
+                <div class="stack">
+                  <span>#color</span>
+                  <span>#birthday</span>
+                  <span>#mobile</span>
+                </div>
+                <div class="project-links">
+                  <a
+                    href="https://hyveo.github.io/birthday-color-palatte/"
+                    data-ga-event="project_open"
+                    data-ga-section="projects"
+                    data-ga-project="Birthday Color Palatte"
+                    data-ga-label="service"
+                  >
+                    서비스 열기
+                  </a>
+                </div>
+              </div>
+            </article>
+
+            <article class="project-card" data-status="active">
+              <div class="project-body">
+                <div class="project-topline">
+                  <div class="badge-row">
+                    <span class="badge badge-live">active</span>
+                    <span class="badge">Mini Tool</span>
+                  </div>
+                  <span>★ 12</span>
+                </div>
+                <h3>today-receipt</h3>
+                <p>
+                  하루 지출을 영수증처럼 기록하고, localStorage 저장과 PNG 내보내기를 지원하는
+                  미니멀 웹 도구입니다.
+                </p>
+                <div class="stack">
+                  <span>#receipt</span>
+                  <span>#localStorage</span>
+                  <span>#png</span>
+                </div>
+                <div class="project-links">
+                  <a
+                    href="https://hyveo.github.io/today-receipt/"
+                    data-ga-event="project_open"
+                    data-ga-section="projects"
+                    data-ga-project="Today Receipt"
+                    data-ga-label="service"
+                  >
+                    서비스 열기
+                  </a>
+                </div>
+              </div>
+            </article>
+            <div class="project-empty" data-empty-state>
+              <span>wip 프로젝트는 아직 정리 중입니다.<br />다음 작은 실험을 준비하고 있어요.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="readme" id="readme" aria-labelledby="readme-title">
+        <div class="section-inner">
+          <div class="readme-card">
+            <div class="panel-title">README.md</div>
+            <div class="readme-body">
+              <div>
+                <h2 id="readme-title">안녕하세요, 저는 hyveo입니다.</h2>
+                <p>// toy project maker & weekend tinkerer</p>
+                <p>
+                  코딩을 일로도 하고 취미로도 합니다. 퇴근 후 노트북을 열고
+                  "이거 있으면 편하겠다" 싶은 작은 웹을 만드는 편이에요.
+                </p>
+                <p>
+                  완벽한 제품보다 작동하는 것, 큰 서비스보다 내 생활에 맞는 것을 좋아합니다.
+                  이 페이지는 그런 프로젝트들을 모아둔 작은 인덱스입니다.
+                </p>
+                <div class="stack">
+                  <span>GitHub Pages</span>
+                  <span>Static Web</span>
+                  <span>AI Report</span>
+                  <span>Color</span>
+                  <span>Receipt</span>
+                </div>
+              </div>
+              <div>
+                <div class="info-box">
+                  <span><b>location:</b> Seoul, KR</span>
+                  <span><b>work:</b> developer</span>
+                  <span><b>side_hustle:</b> tiny web maker</span>
+                  <span><b>status:</b> brewing</span>
+                </div>
+                <div class="log-box" style="margin-top: 14px">
+                  <div><b>&gt;</b> git log --author="me"</div>
+                  <div>a3f8c21 feat: 서비스 허브 정리</div>
+                  <div>b19de04 fix: 모바일 간격 조정</div>
+                  <div>c72af15 chore: 프로젝트 링크 연결</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
+
+    <footer class="site-footer" id="contact">
+      <div class="footer-inner">
+        <span>HYVEO Projects · © 2026 hyveo</span>
+        <a
+          href="mailto:app.hyveo@gmail.com"
+          data-ga-event="contact_click"
+          data-ga-section="footer"
+          data-ga-label="email"
+        >
+          app.hyveo@gmail.com
+        </a>
+      </div>
+    </footer>
+    <script>
+      (function () {
+        var themeButton = document.querySelector("[data-theme-toggle]");
+        var filterButtons = Array.prototype.slice.call(document.querySelectorAll("[data-filter]"));
+        var projectCards = Array.prototype.slice.call(document.querySelectorAll("[data-status]"));
+        var emptyState = document.querySelector("[data-empty-state]");
+        var terminalBody = document.querySelector(".terminal-body");
+
+        function setTheme(theme) {
+          document.body.dataset.theme = theme;
+          if (themeButton) {
+            themeButton.textContent = theme === "dark" ? "☼" : "☾";
+            themeButton.setAttribute("aria-label", theme === "dark" ? "라이트 모드 전환" : "다크 모드 전환");
+          }
+          try {
+            window.localStorage.setItem("hyveo-theme", theme);
+          } catch (error) {
+            return;
+          }
+        }
+
+        function setProjectFilter(filter) {
+          filterButtons.forEach(function (button) {
+            button.classList.toggle("is-active", button.dataset.filter === filter);
+          });
+
+          projectCards.forEach(function (card) {
+            var shouldShow = filter === "all" || card.dataset.status === filter;
+            card.classList.toggle("is-hidden", !shouldShow);
+          });
+
+          var foundCount = projectCards.filter(function (card) {
+            return !card.classList.contains("is-hidden");
+          }).length;
+
+          if (emptyState) {
+            emptyState.classList.toggle("is-visible", foundCount === 0);
+          }
+
+          if (terminalBody) {
+            terminalBody.innerHTML =
+              '<div><span class="prompt">&gt;</span> filter projects --' +
+              filter +
+              '</div><div><span class="prompt">&gt;</span> found ' +
+              foundCount +
+              ' project(s)<span class="cursor"></span></div>';
+          }
+        }
+
+        try {
+          setTheme(window.localStorage.getItem("hyveo-theme") || "light");
+        } catch (error) {
+          setTheme("light");
+        }
+
+        if (themeButton) {
+          themeButton.addEventListener("click", function () {
+            setTheme(document.body.dataset.theme === "dark" ? "light" : "dark");
+          });
+        }
+
+        filterButtons.forEach(function (button) {
+          button.addEventListener("click", function () {
+            setProjectFilter(button.dataset.filter || "all");
+          });
+        });
+
+        function trackEvent(eventName, params) {
+          if (typeof window.gtag !== "function") return;
+          window.gtag("event", eventName, params);
+        }
+
+        document.addEventListener("click", function (event) {
+          var clicked = event.target;
+          if (!clicked || !clicked.closest) return;
+
+          var target = clicked.closest("[data-ga-event]");
+          if (!target) return;
+
+          var params = {
+            event_category: "engagement",
+            event_label: target.dataset.gaLabel,
+            link_url: target.href,
+            project_name: target.dataset.gaProject,
+            section: target.dataset.gaSection,
+            transport_type: "beacon",
+          };
+
+          Object.keys(params).forEach(function (key) {
+            if (!params[key]) delete params[key];
+          });
+
+          trackEvent(target.dataset.gaEvent, params);
+        });
+      })();
+    </script>
   </body>
 </html>

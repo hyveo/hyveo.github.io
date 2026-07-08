@@ -21,6 +21,7 @@ jobs:
       name: github-pages
     env:
       GOOGLE_ADSENSE_CLIENT: ${{ vars.GOOGLE_ADSENSE_CLIENT }}
+      GOOGLE_ANALYTICS_MEASUREMENT_ID: ${{ vars.GOOGLE_ANALYTICS_MEASUREMENT_ID }}
     steps:
       - uses: actions/checkout@v4
 
@@ -32,20 +33,38 @@ jobs:
 
           python3 - <<'PY'
           import html
+          import json
           import os
           from pathlib import Path
 
           client = os.environ.get("GOOGLE_ADSENSE_CLIENT", "").strip()
+          analytics_id = os.environ.get("GOOGLE_ANALYTICS_MEASUREMENT_ID", "").strip()
           adsense_head = ""
+          analytics_head = ""
 
           if client:
               escaped = html.escape(client, quote=True)
               adsense_head = f'''<meta name="google-adsense-account" content="{escaped}" />
               <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={escaped}" crossorigin="anonymous"></script>'''
 
+          if analytics_id:
+              if not analytics_id.startswith("G-"):
+                  raise SystemExit("GOOGLE_ANALYTICS_MEASUREMENT_ID must be a GA4 measurement ID that starts with G-")
+
+              escaped = html.escape(analytics_id, quote=True)
+              analytics_head = f'''<script async src="https://www.googletagmanager.com/gtag/js?id={escaped}"></script>
+              <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag() {{ window.dataLayer.push(arguments); }}
+                gtag("js", new Date());
+                gtag("config", {json.dumps(analytics_id)});
+              </script>'''
+
           template = Path("index.template.html").read_text(encoding="utf-8")
           Path("dist/index.html").write_text(
-              template.replace("{{GOOGLE_ADSENSE_HEAD}}", adsense_head),
+              template
+                  .replace("<!-- GOOGLE_ADSENSE_HEAD -->", adsense_head)
+                  .replace("<!-- GOOGLE_ANALYTICS_HEAD -->", analytics_head),
               encoding="utf-8",
           )
 
