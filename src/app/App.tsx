@@ -152,15 +152,28 @@ function getYearProgress() {
 function ContribGrid({ progress }: { progress: ReturnType<typeof getYearProgress> }) {
   const { cells, elapsedDays, weeks, days } = progress;
   const fillOrder = useMemo(() => {
-    const order = Array.from({ length: elapsedDays }).map((_, index) => index);
+    const todayIndex = elapsedDays - 1;
+    const order: number[] = [];
 
-    for (let i = order.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [order[i], order[j]] = [order[j], order[i]];
+    for (let week = 0; week < weeks; week++) {
+      const start = week * days;
+      const end = Math.min(start + days, elapsedDays);
+      const weekIndexes = Array.from({ length: end - start })
+        .map((_, index) => start + index)
+        .filter((index) => index !== todayIndex);
+
+      for (let i = weekIndexes.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [weekIndexes[i], weekIndexes[j]] = [weekIndexes[j], weekIndexes[i]];
+      }
+
+      order.push(...weekIndexes);
     }
 
+    if (todayIndex >= 0) order.push(todayIndex);
+
     return order;
-  }, [elapsedDays]);
+  }, [days, elapsedDays, weeks]);
   const [filledIndexes, setFilledIndexes] = useState<Set<number>>(new Set());
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
 
@@ -189,7 +202,7 @@ function ContribGrid({ progress }: { progress: ReturnType<typeof getYearProgress
       index += 1;
 
       if (index < fillOrder.length) {
-        timeout = window.setTimeout(fillNext, 80 + Math.random() * 420);
+        timeout = window.setTimeout(fillNext, 30 + Math.random() * 130);
       }
     }
 
