@@ -81,6 +81,7 @@ jobs:
           )
           PY
 
+          cp -R public/. dist
           cp -R assets dist/assets
 
       - uses: actions/upload-pages-artifact@v3
