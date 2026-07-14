@@ -9,6 +9,7 @@ const PROJECTS = [
     langColor: "#F1E05A",
     stars: 31,
     desc: "YouTube 방송 콘텐츠를 AI 분석 리포트로 재구성해 핵심 주제와 관전 포인트를 빠르게 읽을 수 있게 정리합니다.",
+    period: "2026.06 - 운영 중",
     tags: ["ai", "youtube", "report"],
     status: "active",
     commits: 64,
@@ -21,6 +22,7 @@ const PROJECTS = [
     langColor: "#F1E05A",
     stars: 18,
     desc: "생일을 입력하면 나만의 Birthday Color chip을 보여주는 모바일 중심의 컬러 제너레이터입니다.",
+    period: "2026.07 - 운영 중",
     tags: ["color", "birthday", "mobile"],
     status: "active",
     commits: 42,
@@ -33,6 +35,7 @@ const PROJECTS = [
     langColor: "#F1E05A",
     stars: 12,
     desc: "하루 지출을 영수증처럼 기록하고, localStorage 저장과 PNG 내보내기를 지원하는 미니멀 웹 도구입니다.",
+    period: "2026.06 - 운영 중",
     tags: ["receipt", "localStorage", "png"],
     status: "active",
     commits: 28,
@@ -45,11 +48,25 @@ const PROJECTS = [
     langColor: "#3178C6",
     stars: 7,
     desc: "모바일에서 보기 좋은 청첩장 카드를 만들고, 공유하기 쉽게 다듬는 작업 중인 프로젝트입니다.",
+    period: "2026.07 - 작업 중",
     tags: ["wedding", "mobile", "card"],
     status: "wip",
     commits: 12,
     lastCommit: "작업 중",
     url: "",
+  },
+  {
+    name: "kakao-free-emoticons-alarm",
+    lang: "Markdown",
+    langColor: "#7D8590",
+    stars: 0,
+    desc: "카카오톡 무료 이모티콘 정보를 주간 리포트 형태로 정리하는 작업 중인 프로젝트입니다.",
+    period: "2026.07 - 작업 중",
+    tags: ["kakao", "emoticon", "report"],
+    status: "wip",
+    commits: 0,
+    lastCommit: "작업 중",
+    url: "https://hyveo.github.io/kakao-free-emotions",
   },
 ];
 
@@ -478,7 +495,14 @@ export default function App() {
                   </div>
                 </div>
 
-                <p className="text-[#7D8590] text-xs leading-relaxed mb-4">{project.desc}</p>
+                <p className="text-[#7D8590] text-xs leading-relaxed mb-2">{project.desc}</p>
+
+                <div
+                  className="text-[10px] text-muted-foreground mb-4"
+                  style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                >
+                  period: {project.period}
+                </div>
 
                 <div className="flex items-center gap-3 flex-wrap">
                   <div className="flex items-center gap-1.5">
