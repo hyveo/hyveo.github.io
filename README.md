@@ -29,7 +29,7 @@ YouTube 방송 콘텐츠를 AI 분석 리포트로 재구성해 핵심 주제, �
 
 ### WoW Forever Addons
 
-와우 포에버(World of Warcraft: Forever)용 애드온 모음입니다. 중앙버튼(CentarBar) 포에버 대응판과 레벨링 도우미 레벨페이스(LevelPace)를 배포합니다.
+와우 포에버(World of Warcraft: Forever)용 애드온 모음입니다. 레벨페이스(LevelPace), 센터바(CenterBar), hyveo 애드온 센터(HyveoCenter)를 배포합니다.
 
 - Repository: https://github.com/hyveo/wow-forever-addons
 
