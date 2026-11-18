@@ -27,6 +27,12 @@ YouTube 방송 콘텐츠를 AI 분석 리포트로 재구성해 핵심 주제, �
 - Site: https://hyveo.github.io/today-receipt/
 - Repository: https://github.com/hyveo/today-receipt
 
+### WoW Forever Addons
+
+와우 포에버(World of Warcraft: Forever)용 애드온 모음입니다. 중앙버튼(CentarBar) 포에버 대응판과 레벨링 도우미 레벨페이스(LevelPace)를 배포합니다.
+
+- Repository: https://github.com/hyveo/wow-forever-addons
+
 ## Analytics
 
 GitHub Pages 배포 시 GA4 측정 ID를 `GOOGLE_ANALYTICS_MEASUREMENT_ID` Repository Variable로 설정하면 Google Analytics가 활성화됩니다.
