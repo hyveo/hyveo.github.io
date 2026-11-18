@@ -81,6 +81,19 @@ const PROJECTS = [
     lastCommit: "오늘",
     url: "https://mcu-saga-seven.vercel.app",
   },
+  {
+    name: "wow-forever-addons",
+    lang: "Lua",
+    langColor: "#000080",
+    stars: 0,
+    desc: "와우 포에버용 애드온 모음입니다. 중앙버튼(CentarBar) 포에버 대응판과 레벨링 도우미 레벨페이스(LevelPace)를 배포합니다.",
+    period: "2026.11 - 운영 중",
+    tags: ["wow", "addon", "lua"],
+    status: "active",
+    commits: 12,
+    lastCommit: "오늘",
+    url: "https://github.com/hyveo/wow-forever-addons",
+  },
 ];
 
 const STACK = [
