@@ -92,7 +92,7 @@ const PROJECTS = [
     status: "active",
     commits: 1,
     lastCommit: "오늘",
-    url: "https://github.com/hyveo/wow-forever-addons",
+    url: "/addons/",
   },
 ];
 
@@ -316,6 +316,7 @@ export default function App() {
           <div className="flex items-center gap-6">
             <a href="#projects" className="text-xs text-muted-foreground hover:text-foreground transition-colors" style={{ fontFamily: "'JetBrains Mono', monospace" }}>projects</a>
             <a href="#about" className="text-xs text-muted-foreground hover:text-foreground transition-colors" style={{ fontFamily: "'JetBrains Mono', monospace" }}>about</a>
+            <a href="/addons/" className="text-xs text-muted-foreground hover:text-foreground transition-colors" style={{ fontFamily: "'JetBrains Mono', monospace" }}>addons</a>
             <button
               onClick={() => setDark((d) => !d)}
               className="p-1.5 rounded border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
@@ -488,8 +489,8 @@ export default function App() {
               <motion.a
                 key={project.name}
                 href={project.url || undefined}
-                target={project.url ? "_blank" : undefined}
-                rel={project.url ? "noreferrer" : undefined}
+                target={project.url?.startsWith("http") ? "_blank" : undefined}
+                rel={project.url?.startsWith("http") ? "noreferrer" : undefined}
                 layout
                 initial={{ opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}
