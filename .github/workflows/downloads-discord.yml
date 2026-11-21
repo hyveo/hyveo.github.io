@@ -1,0 +1,20 @@
+name: 다운로드 수 디스코드 알림
+
+on:
+  push:
+    branches: [main]
+    paths: [public/addons/downloads.json]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 디스코드로 보내기
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: python3 .github/scripts/discord_downloads.py

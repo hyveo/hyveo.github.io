@@ -115,6 +115,14 @@ h3{margin:0;font-size:17px;font-weight:700}
 .badge.ver{color:#3FB950;border-color:rgba(63,185,80,.5)}
 .badge.wait{color:#E3B341;border-color:rgba(227,179,65,.5)}
 .badge.rec{background:#3FB950;color:#0D1117;border-color:#3FB950;font-weight:600}
+.badge.dl{color:#58A6FF;border-color:rgba(88,166,255,.5)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
+.stat{background:#0D1117;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.stat b{font-size:26px;font-weight:800;line-height:1.2}
+.stat .up{color:#3FB950;font-size:13px}
+.chart svg{display:block;width:100%;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:#9198A1}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}
 .card{background:#161B22;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:16px}
 .card .head{display:flex;gap:16px;align-items:center}
 .card .head img{width:64px;height:64px;border-radius:12px;flex-shrink:0}
@@ -137,6 +145,51 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;
 footer a{color:#9198A1}
 """
 
+DL_JS = r"""<script>
+(function(){
+  var COLORS={"centerbar":"#58A6FF","levelpace":"#A371F7","hyveo-center":"#E3B341"};
+  var url=document.currentScript.getAttribute('data-src');
+  function n(x){return Number(x||0).toLocaleString('ko-KR');}
+  function el(tag,attrs,text){var e=document.createElementNS('http://www.w3.org/2000/svg',tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;return e;}
+  fetch(url,{cache:'no-cache'}).then(function(r){return r.json();}).then(function(d){
+    var h=d.history||[];if(!h.length)return;
+    var last=h[h.length-1],prev=h.length>1?h[h.length-2]:null,keys=Object.keys(d.addons||{});
+    document.querySelectorAll('[data-dl]').forEach(function(b){var k=b.getAttribute('data-dl');if(last[k]==null)return;b.textContent='다운로드 '+n(last[k]);b.hidden=false;});
+    var box=document.getElementById('downloads');if(!box)return;box.hidden=false;
+    var total=function(r){return keys.reduce(function(s,k){return s+(r[k]||0);},0);};
+    var stats=box.querySelector('.stats');stats.textContent='';
+    [['total','전체']].concat(keys.map(function(k){return [k,d.addons[k]];})).forEach(function(p){
+      var v=p[0]==='total'?total(last):(last[p[0]]||0),pv=prev?(p[0]==='total'?total(prev):(prev[p[0]]||0)):null;
+      var c=document.createElement('div');c.className='stat';
+      var l=document.createElement('span');l.className='muted';l.textContent=p[1];
+      var b=document.createElement('b');b.textContent=n(v);
+      c.appendChild(l);c.appendChild(b);
+      if(pv!=null){var u=document.createElement('span');u.className='up mono';u.textContent=(v-pv>=0?'+':'')+n(v-pv)+' 지난 기록 대비';c.appendChild(u);}
+      stats.appendChild(c);
+    });
+    box.querySelector('.when').textContent=last.at.slice(0,10)+' 기준 · CurseForge 누적 다운로드';
+    var wrap=box.querySelector('.chart');
+    function draw(){
+      wrap.textContent='';var W=Math.max(280,wrap.clientWidth),H=200,P={l:40,r:12,t:12,b:26};
+      var max=Math.max(1,d3max());function d3max(){var m=0;h.forEach(function(r){keys.forEach(function(k){m=Math.max(m,r[k]||0);});});return m;}
+      var svg=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'애드온별 누적 다운로드 추이'});
+      var x=function(i){return h.length<2?(P.l+(W-P.l-P.r)/2):P.l+i*(W-P.l-P.r)/(h.length-1);};
+      var y=function(v){return P.t+(H-P.t-P.b)*(1-v/max);};
+      [0,.5,1].forEach(function(f){var v=Math.round(max*f);svg.appendChild(el('line',{x1:P.l,x2:W-P.r,y1:y(v),y2:y(v),stroke:'rgba(255,255,255,.08)'}));svg.appendChild(el('text',{x:P.l-6,y:y(v)+4,'text-anchor':'end','font-size':11,fill:'#9198A1'},n(v)));});
+      [0,h.length-1].filter(function(i,j,a){return a.indexOf(i)===j;}).forEach(function(i){svg.appendChild(el('text',{x:x(i),y:H-6,'text-anchor':i===0&&h.length>1?'start':(h.length>1?'end':'middle'),'font-size':11,fill:'#9198A1'},h[i].at.slice(5,10)));});
+      keys.forEach(function(k){
+        var pts=h.map(function(r,i){return x(i)+','+y(r[k]||0);}).join(' ');
+        if(h.length>1)svg.appendChild(el('polyline',{points:pts,fill:'none',stroke:COLORS[k]||'#E6EDF3','stroke-width':2}));
+        h.forEach(function(r,i){var c=el('circle',{cx:x(i),cy:y(r[k]||0),r:3,fill:COLORS[k]||'#E6EDF3'});c.appendChild(el('title',{},(d.addons[k]||k)+' '+r.at.slice(0,10)+': '+n(r[k])));svg.appendChild(c);});
+      });
+      wrap.appendChild(svg);
+    }
+    draw();window.addEventListener('resize',draw);
+    var lg=box.querySelector('.legend');lg.textContent='';keys.forEach(function(k){var s=document.createElement('span');var i=document.createElement('i');i.style.background=COLORS[k]||'#E6EDF3';s.appendChild(i);s.appendChild(document.createTextNode(d.addons[k]));lg.appendChild(s);});
+  }).catch(function(){});
+})();
+</script>"""
+
 DL = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>'
 
 
@@ -150,7 +203,7 @@ def zip_url(a):
 
 def page(title, desc, body, depth):
     up = "../" * depth
-    return f"""<!doctype html>
+    out = f"""<!doctype html>
 <html lang="ko">
 <head>
 <meta charset="utf-8">
@@ -173,6 +226,7 @@ def page(title, desc, body, depth):
 <div class="wrap"><main>
 {body}
 </main></div>
+<script data-src="{up}addons/downloads.json">__DLJS__</script>
 <footer><div class="wrap mono">
 <span>© @hyveo · All Rights Reserved</span>
 <a href="{ISSUES}">버그 제보는 GitHub Issues로</a>
@@ -180,6 +234,8 @@ def page(title, desc, body, depth):
 </body>
 </html>
 """
+    js = DL_JS.replace("<script>", f'<script data-src="{up}addons/downloads.json">', 1)
+    return out.replace(f'<script data-src="{up}addons/downloads.json">__DLJS__</script>', js)
 
 
 def cf_button(a):
@@ -196,7 +252,7 @@ def index():
         cards.append(f"""<article class="card">
 <div class="head"><img src="img/{a['slug'].replace('-','')}-icon.png" alt="{e(a['name'])} 아이콘" width="64" height="64">
 <div><h3>{e(a['name'])} <span class="mono" style="font-size:12px;color:#9198A1;font-weight:400">{e(a['en'])}</span></h3>
-<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px"><span class="badge ver mono">{a['version']}</span>{wait_badge(a)}</div></div></div>
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px"><span class="badge ver mono">{a['version']}</span><span class="badge dl mono" data-dl="{a['slug']}" hidden></span>{wait_badge(a)}</div></div></div>
 <p class="muted" style="color:#C9D1D9;font-size:15px">{e(a['summary'])}</p>
 <img class="shot" src="img/{a['card']}" alt="{e(a['name'])} 예시 화면" loading="lazy">
 <div class="btns">{cf_button(a)}
@@ -226,7 +282,16 @@ def index():
 <h2 id="list">애드온 목록</h2>
 <div class="cards">
 {chr(10).join(cards)}
-</div></section>"""
+</div></section>
+
+<section id="downloads" class="box" aria-labelledby="dlh" hidden>
+<h2 id="dlh">다운로드 현황</h2>
+<p class="muted when"></p>
+<div class="stats"></div>
+<div class="chart"></div>
+<div class="legend"></div>
+<p class="muted" style="font-size:12px">매일 저녁 CurseForge 기준으로 갱신돼요. zip 직접 다운로드는 포함되지 않아요.</p>
+</section>"""
     return page("와우 포에버 애드온 · hyveo", "레벨페이스, 센터바, hyveo 애드온 센터 — 와우 포에버 애드온 모음", body, 1)
 
 
@@ -241,7 +306,7 @@ def detail(a):
 <section class="hero">
 <img src="{icon}" alt="{e(a['name'])} 아이콘" width="140" height="140">
 <div class="txt">
-<div style="display:flex;flex-wrap:wrap;gap:8px"><span class="badge ver mono">{a['version']}</span><span class="badge mono">WoW Forever</span>{wait_badge(a)}</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px"><span class="badge ver mono">{a['version']}</span><span class="badge mono">WoW Forever</span><span class="badge dl mono" data-dl="{a['slug']}" hidden></span>{wait_badge(a)}</div>
 <h1>{e(a['name'])} <span class="mono" style="font-size:22px;font-weight:400;color:#9198A1">{e(a['en'])}</span></h1>
 <p class="lead">{e(a['lead'])} by @hyveo</p>
 <div class="btns">{cf_button(a)}
