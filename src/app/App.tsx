@@ -61,12 +61,12 @@ const PROJECTS = [
     langColor: "#F1E05A",
     stars: 1,
     desc: "무료 카카오톡 이모티콘 정보를 모아 보여주는 큐레이션 서비스입니다.",
-    period: "2026.07 - 운영 중",
+    period: "2026.07 - 중단",
     tags: ["kakao", "emoticon", "curation"],
-    status: "active",
+    status: "stopped",
     commits: 8,
-    lastCommit: "오늘",
-    url: "https://emopick-rho.vercel.app/",
+    lastCommit: "중단",
+    url: "",
   },
   {
     name: "mcu-saga-guide",
@@ -511,6 +511,11 @@ export default function App() {
                     {project.status === "wip" && (
                       <span className="text-[10px] border border-[#F0A732] text-[#F0A732] px-1.5 py-0.5 rounded-sm" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
                         wip
+                      </span>
+                    )}
+                    {project.status === "stopped" && (
+                      <span className="text-[10px] border border-[#7D8590] text-[#7D8590] px-1.5 py-0.5 rounded-sm" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                        중단
                       </span>
                     )}
                   </div>
