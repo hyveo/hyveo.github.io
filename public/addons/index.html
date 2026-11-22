@@ -45,10 +45,10 @@ h3{margin:0;font-size:17px;font-weight:700}
 .badge.ver{color:#3FB950;border-color:rgba(63,185,80,.5)}
 .badge.wait{color:#E3B341;border-color:rgba(227,179,65,.5)}
 .badge.rec{background:#3FB950;color:#0D1117;border-color:#3FB950;font-weight:600}
-.badge.dl{color:#58A6FF;border-color:rgba(88,166,255,.5)}
+.badge.dl{color:#0D1117;background:#58A6FF;border-color:#58A6FF;font-weight:700;font-size:13px;padding:2px 10px}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
 .stat{background:#0D1117;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:2px}
-.stat b{font-size:26px;font-weight:800;line-height:1.2}
+.stat b{font-size:32px;font-weight:800;line-height:1.2}
 .stat .up{color:#3FB950;font-size:13px}
 .chart svg{display:block;width:100%;height:auto}
 .vt{width:100%;border-collapse:collapse;font-size:14px}
@@ -96,6 +96,19 @@ footer a{color:#9198A1}
 <a class="btn" href="https://github.com/hyveo/wow-forever-addons">GitHub 레포</a></div>
 </section>
 
+<section id="downloads" class="box" aria-labelledby="dlh" hidden>
+<h2 id="dlh">다운로드 현황</h2>
+<p class="muted when"></p>
+<div class="stats"></div>
+<div class="chart"></div>
+<div class="legend"></div>
+<h3 style="margin-top:8px">버전별 다운로드</h3>
+<div class="grid">
+<div class="box" data-dl-versions="levelpace" hidden style="padding:16px;gap:8px"><h3 style="font-size:15px">레벨페이스</h3><div class="vbody"></div></div><div class="box" data-dl-versions="centerbar" hidden style="padding:16px;gap:8px"><h3 style="font-size:15px">센터바</h3><div class="vbody"></div></div><div class="box" data-dl-versions="hyveo-center" hidden style="padding:16px;gap:8px"><h3 style="font-size:15px">hyveo 애드온 센터</h3><div class="vbody"></div></div>
+</div>
+<p class="muted" style="font-size:12px">매일 저녁 CurseForge 기준으로 갱신돼요. zip 직접 다운로드는 포함되지 않아요.</p>
+</section>
+
 <section style="display:flex;flex-direction:column;gap:16px" aria-labelledby="ways">
 <h2 id="ways">설치 방법은 두 가지예요</h2>
 <div class="grid">
@@ -139,19 +152,6 @@ footer a{color:#9198A1}
 <a class="btn link" href="hyveo-center/">자세히 보기 →</a></div>
 </article>
 </div></section>
-
-<section id="downloads" class="box" aria-labelledby="dlh" hidden>
-<h2 id="dlh">다운로드 현황</h2>
-<p class="muted when"></p>
-<div class="stats"></div>
-<div class="chart"></div>
-<div class="legend"></div>
-<h3 style="margin-top:8px">버전별 다운로드</h3>
-<div class="grid">
-<div class="box" data-dl-versions="levelpace" hidden style="padding:16px;gap:8px"><h3 style="font-size:15px">레벨페이스</h3><div class="vbody"></div></div><div class="box" data-dl-versions="centerbar" hidden style="padding:16px;gap:8px"><h3 style="font-size:15px">센터바</h3><div class="vbody"></div></div><div class="box" data-dl-versions="hyveo-center" hidden style="padding:16px;gap:8px"><h3 style="font-size:15px">hyveo 애드온 센터</h3><div class="vbody"></div></div>
-</div>
-<p class="muted" style="font-size:12px">매일 저녁 CurseForge 기준으로 갱신돼요. zip 직접 다운로드는 포함되지 않아요.</p>
-</section>
 </main></div>
 <script data-src="../addons/downloads.json">
 (function(){

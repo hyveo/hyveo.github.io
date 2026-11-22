@@ -115,10 +115,10 @@ h3{margin:0;font-size:17px;font-weight:700}
 .badge.ver{color:#3FB950;border-color:rgba(63,185,80,.5)}
 .badge.wait{color:#E3B341;border-color:rgba(227,179,65,.5)}
 .badge.rec{background:#3FB950;color:#0D1117;border-color:#3FB950;font-weight:600}
-.badge.dl{color:#58A6FF;border-color:rgba(88,166,255,.5)}
+.badge.dl{color:#0D1117;background:#58A6FF;border-color:#58A6FF;font-weight:700;font-size:13px;padding:2px 10px}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
 .stat{background:#0D1117;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:2px}
-.stat b{font-size:26px;font-weight:800;line-height:1.2}
+.stat b{font-size:32px;font-weight:800;line-height:1.2}
 .stat .up{color:#3FB950;font-size:13px}
 .chart svg{display:block;width:100%;height:auto}
 .vt{width:100%;border-collapse:collapse;font-size:14px}
@@ -289,6 +289,19 @@ def index():
 <a class="btn" href="{REPO}">GitHub 레포</a></div>
 </section>
 
+<section id="downloads" class="box" aria-labelledby="dlh" hidden>
+<h2 id="dlh">다운로드 현황</h2>
+<p class="muted when"></p>
+<div class="stats"></div>
+<div class="chart"></div>
+<div class="legend"></div>
+<h3 style="margin-top:8px">버전별 다운로드</h3>
+<div class="grid">
+{''.join(f'<div class="box" data-dl-versions="{a["slug"]}" hidden style="padding:16px;gap:8px"><h3 style="font-size:15px">{e(a["name"])}</h3><div class="vbody"></div></div>' for a in ADDONS)}
+</div>
+<p class="muted" style="font-size:12px">매일 저녁 CurseForge 기준으로 갱신돼요. zip 직접 다운로드는 포함되지 않아요.</p>
+</section>
+
 <section style="display:flex;flex-direction:column;gap:16px" aria-labelledby="ways">
 <h2 id="ways">설치 방법은 두 가지예요</h2>
 <div class="grid">
@@ -302,20 +315,7 @@ def index():
 <h2 id="list">애드온 목록</h2>
 <div class="cards">
 {chr(10).join(cards)}
-</div></section>
-
-<section id="downloads" class="box" aria-labelledby="dlh" hidden>
-<h2 id="dlh">다운로드 현황</h2>
-<p class="muted when"></p>
-<div class="stats"></div>
-<div class="chart"></div>
-<div class="legend"></div>
-<h3 style="margin-top:8px">버전별 다운로드</h3>
-<div class="grid">
-{''.join(f'<div class="box" data-dl-versions="{a["slug"]}" hidden style="padding:16px;gap:8px"><h3 style="font-size:15px">{e(a["name"])}</h3><div class="vbody"></div></div>' for a in ADDONS)}
-</div>
-<p class="muted" style="font-size:12px">매일 저녁 CurseForge 기준으로 갱신돼요. zip 직접 다운로드는 포함되지 않아요.</p>
-</section>"""
+</div></section>"""
     return page("와우 포에버 애드온 · hyveo", "레벨페이스, 센터바, hyveo 애드온 센터 — 와우 포에버 애드온 모음", body, 1)
 
 
