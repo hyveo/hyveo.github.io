@@ -42,7 +42,7 @@ ADDONS = [
         "folder": "CenterBar",
         "name": "센터바",
         "en": "CenterBar",
-        "version": "1.5.0",
+        "version": "1.5.1",
         "cf": "https://www.curseforge.com/wow/addons/centerbar",
         "cf_live": True,
         "summary": "캐릭터 양옆에 액션 버튼을 최대 18개 놓아 주는 애드온이에요. 시선을 화면 가운데에 둔 채로 기술을 쓸 수 있어요.",
