@@ -16,41 +16,38 @@ last = h[-1]
 prev = h[-2] if len(h) > 1 else None
 
 
-def diff(k):
-    if prev is None:
+def change(now, before):
+    if before is None:
         return ""
-    v = last.get(k, 0) - prev.get(k, 0)
-    return f" (+{v})" if v >= 0 else f" ({v})"
+    v = now - before
+    return f"  (+{v})" if v > 0 else ("" if v == 0 else f"  ({v})")
 
 
-def versions_line(k):
+def total(r):
+    return sum(r.get(k, 0) for k in names)
+
+
+fields = []
+for k, name in names.items():
+    cnt = last.get(k, 0)
+    head = f"{name} — {cnt:,}회" + change(cnt, prev.get(k) if prev else None)
     v = (last.get("versions") or {}).get(k)
-    if not v:
-        return None
     pv = ((prev or {}).get("versions") or {}).get(k)
-    parts = []
-    for ver, cnt in v.items():
-        d = "" if pv is None else (f" (+{cnt - pv.get(ver, 0)})" if cnt - pv.get(ver, 0) > 0 else "")
-        parts.append(f"{ver} {cnt:,}{d}")
-    return "　└ " + " · ".join(parts)
+    if v:
+        rows = [f"`v{ver}`  **{n:,}**회" + change(n, None if pv is None else pv.get(ver, 0)) for ver, n in v.items()]
+        value = "\n".join(rows)
+    else:
+        value = "버전별 기록 없음"
+    fields.append({"name": head, "value": value, "inline": True})
 
-
-lines = []
-for k in names:
-    lines.append(f"**{names[k]}** {last.get(k, 0):,}{diff(k)}")
-    vl = versions_line(k)
-    if vl:
-        lines.append(vl)
-total = sum(last.get(k, 0) for k in names)
-ptotal = sum(prev.get(k, 0) for k in names) if prev else None
-tdiff = "" if ptotal is None else f" (+{total - ptotal})" if total >= ptotal else f" ({total - ptotal})"
-
+t = total(last)
 payload = {
     "username": "hyveo addons",
     "embeds": [{
         "title": f"📦 CurseForge 다운로드 · {last['at'][:10]}",
-        "url": "https://hyveo.github.io/addons/#downloads",
-        "description": "\n".join(lines) + f"\n\n합계 **{total:,}**{tdiff}",
+        "url": "https://hyveo.github.io/addons/",
+        "description": f"전체 **{t:,}회**" + change(t, total(prev) if prev else None),
+        "fields": fields,
         "color": 0x3FB950,
     }],
 }
