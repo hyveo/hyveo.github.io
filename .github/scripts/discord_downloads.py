@@ -23,7 +23,24 @@ def diff(k):
     return f" (+{v})" if v >= 0 else f" ({v})"
 
 
-lines = [f"**{names[k]}** {last.get(k, 0):,}{diff(k)}" for k in names]
+def versions_line(k):
+    v = (last.get("versions") or {}).get(k)
+    if not v:
+        return None
+    pv = ((prev or {}).get("versions") or {}).get(k)
+    parts = []
+    for ver, cnt in v.items():
+        d = "" if pv is None else (f" (+{cnt - pv.get(ver, 0)})" if cnt - pv.get(ver, 0) > 0 else "")
+        parts.append(f"{ver} {cnt:,}{d}")
+    return "　└ " + " · ".join(parts)
+
+
+lines = []
+for k in names:
+    lines.append(f"**{names[k]}** {last.get(k, 0):,}{diff(k)}")
+    vl = versions_line(k)
+    if vl:
+        lines.append(vl)
 total = sum(last.get(k, 0) for k in names)
 ptotal = sum(prev.get(k, 0) for k in names) if prev else None
 tdiff = "" if ptotal is None else f" (+{total - ptotal})" if total >= ptotal else f" ({total - ptotal})"

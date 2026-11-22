@@ -121,6 +121,11 @@ h3{margin:0;font-size:17px;font-weight:700}
 .stat b{font-size:26px;font-weight:800;line-height:1.2}
 .stat .up{color:#3FB950;font-size:13px}
 .chart svg{display:block;width:100%;height:auto}
+.vt{width:100%;border-collapse:collapse;font-size:14px}
+.vt th,.vt td{padding:6px 4px;border-bottom:1px solid rgba(255,255,255,.08);text-align:right}
+.vt th:first-child,.vt td:first-child{text-align:left}
+.vt th{color:#9198A1;font-weight:500;font-size:12px}
+.vt .up{color:#3FB950}
 .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:#9198A1}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}
 .card{background:#161B22;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:16px}
@@ -155,6 +160,21 @@ DL_JS = r"""<script>
     var h=d.history||[];if(!h.length)return;
     var last=h[h.length-1],prev=h.length>1?h[h.length-2]:null,keys=Object.keys(d.addons||{});
     document.querySelectorAll('[data-dl]').forEach(function(b){var k=b.getAttribute('data-dl');if(last[k]==null)return;b.textContent='다운로드 '+n(last[k]);b.hidden=false;});
+    var vlast=null,vprev=null;for(var i=h.length-1;i>=0;i--){if(h[i].versions){if(!vlast)vlast=h[i];else{vprev=h[i];break;}}}
+    document.querySelectorAll('[data-dl-versions]').forEach(function(w){
+      var k=w.getAttribute('data-dl-versions'),v=vlast&&vlast.versions[k];if(!v)return;
+      var pv=vprev&&vprev.versions[k];
+      var t=document.createElement('table');t.className='vt mono';
+      var hr=document.createElement('tr');['버전','다운로드',pv?'변화':''].forEach(function(x){if(x==='')return;var th=document.createElement('th');th.textContent=x;hr.appendChild(th);});t.appendChild(hr);
+      Object.keys(v).forEach(function(ver){var tr=document.createElement('tr');
+        var a=document.createElement('td');a.textContent=ver;tr.appendChild(a);
+        var b=document.createElement('td');b.textContent=n(v[ver]);tr.appendChild(b);
+        if(pv){var c=document.createElement('td');var dv=v[ver]-(pv[ver]||0);c.textContent=(dv>0?'+':'')+n(dv);if(dv>0)c.className='up';tr.appendChild(c);}
+        t.appendChild(tr);});
+      var tgt=w.querySelector('.vbody')||w;tgt.textContent='';tgt.appendChild(t);
+      var when=w.querySelector('.vwhen');if(when)when.textContent=vlast.at.slice(0,10)+' 기준';
+      w.hidden=false;
+    });
     var box=document.getElementById('downloads');if(!box)return;box.hidden=false;
     var total=function(r){return keys.reduce(function(s,k){return s+(r[k]||0);},0);};
     var stats=box.querySelector('.stats');stats.textContent='';
@@ -290,6 +310,10 @@ def index():
 <div class="stats"></div>
 <div class="chart"></div>
 <div class="legend"></div>
+<h3 style="margin-top:8px">버전별 다운로드</h3>
+<div class="grid">
+{''.join(f'<div class="box" data-dl-versions="{a["slug"]}" hidden style="padding:16px;gap:8px"><h3 style="font-size:15px">{e(a["name"])}</h3><div class="vbody"></div></div>' for a in ADDONS)}
+</div>
 <p class="muted" style="font-size:12px">매일 저녁 CurseForge 기준으로 갱신돼요. zip 직접 다운로드는 포함되지 않아요.</p>
 </section>"""
     return page("와우 포에버 애드온 · hyveo", "레벨페이스, 센터바, hyveo 애드온 센터 — 와우 포에버 애드온 모음", body, 1)
@@ -323,6 +347,13 @@ def detail(a):
 <section style="display:flex;flex-direction:column;gap:16px" aria-labelledby="feat">
 <h2 id="feat">할 수 있는 것</h2>
 <div class="grid">{feats}</div></section>
+
+<section class="box" data-dl-versions="{a['slug']}" hidden aria-labelledby="vdl">
+<h2 id="vdl">버전별 다운로드</h2>
+<p class="muted vwhen"></p>
+<div class="vbody"></div>
+<p class="muted" style="font-size:12px">CurseForge 기준 누적 다운로드예요. zip 직접 다운로드는 포함되지 않아요.</p>
+</section>
 
 <section class="box" aria-labelledby="inst">
 <h2 id="inst">zip으로 직접 설치하기</h2>
