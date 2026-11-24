@@ -174,8 +174,6 @@ footer a{color:#9198A1}
       stats.appendChild(c);
     });
     box.querySelector('.when').textContent=last.at.slice(0,10)+' 기준 · CurseForge 누적 다운로드';
-    var since=box.querySelector('.since'),ni=-1;for(var j=h.length-1;j>=0;j--){if(h[j].note){ni=j;break;}}
-    if(since&&ni>=0){var b0=h[ni];since.textContent='📣 '+b0.note+' ('+b0.at.slice(5,10).replace('-','/')+' '+b0.at.slice(11,16)+') 이후: '+keys.map(function(k){return d.addons[k]+' +'+n((last[k]||0)-(b0[k]||0));}).join(' · ')+' · 합계 +'+n(total(last)-total(b0));since.hidden=false;}
     var wrap=box.querySelector('.chart');
     function draw(){
       wrap.textContent='';var W=Math.max(280,wrap.clientWidth),H=200,P={l:40,r:12,t:12,b:26};
@@ -185,7 +183,6 @@ footer a{color:#9198A1}
       var y=function(v){return P.t+(H-P.t-P.b)*(1-v/max);};
       [0,.5,1].forEach(function(f){var v=Math.round(max*f);svg.appendChild(el('line',{x1:P.l,x2:W-P.r,y1:y(v),y2:y(v),stroke:'rgba(255,255,255,.08)'}));svg.appendChild(el('text',{x:P.l-6,y:y(v)+4,'text-anchor':'end','font-size':11,fill:'#9198A1'},n(v)));});
       [0,h.length-1].filter(function(i,j,a){return a.indexOf(i)===j;}).forEach(function(i){svg.appendChild(el('text',{x:x(i),y:H-6,'text-anchor':i===0&&h.length>1?'start':(h.length>1?'end':'middle'),'font-size':11,fill:'#9198A1'},h[i].at.slice(5,10)));});
-      h.forEach(function(r,i){if(!r.note)return;svg.appendChild(el('line',{x1:x(i),x2:x(i),y1:P.t,y2:H-P.b,stroke:'#E3B341','stroke-dasharray':'4 4'}));svg.appendChild(el('text',{x:x(i)+(i===h.length-1?-4:4),y:P.t+10,'text-anchor':i===h.length-1?'end':'start','font-size':11,fill:'#E3B341'},r.note));});
       keys.forEach(function(k){
         var pts=h.map(function(r,i){return x(i)+','+y(r[k]||0);}).join(' ');
         if(h.length>1)svg.appendChild(el('polyline',{points:pts,fill:'none',stroke:COLORS[k]||'#E6EDF3','stroke-width':2}));

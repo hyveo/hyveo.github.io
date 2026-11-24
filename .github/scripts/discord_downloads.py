@@ -42,11 +42,6 @@ for k, name in names.items():
 
 t = total(last)
 desc = f"전체 **{t:,}회**" + change(t, total(prev) if prev else None)
-marks = [r for r in h if r.get("note")]
-if marks:
-    b0 = marks[-1]
-    parts = " · ".join(f"{names[k]} +{last.get(k, 0) - b0.get(k, 0)}" for k in names)
-    desc += f"\n📣 {b0['note']} ({b0['at'][5:10].replace('-', '/')} {b0['at'][11:16]}) 이후: {parts} · 합계 **+{t - total(b0)}**"
 payload = {
     "username": "hyveo addons",
     "embeds": [{
