@@ -27,6 +27,42 @@ def api(path):
         return json.load(r)["data"]
 
 
+def cfwidget(pid):
+    req = urllib.request.Request(f"https://api.cfwidget.com/{pid}",
+                                 headers={"Accept": "application/json",
+                                          "User-Agent": "hyveo-addons-bot (https://hyveo.github.io)"})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.load(r)
+
+
+def cfwidget_fields(names):
+    fields = []
+    for k, name in names.items():
+        try:
+            w = cfwidget(PROJECTS[k])
+        except Exception as e:  # noqa: BLE001
+            fields.append({"name": f"{name} (CFWidget)", "value": f"불러오지 못했어요: {e}"[:200], "inline": True})
+            continue
+        files = sorted(w.get("files", []), key=lambda f: f.get("uploaded_at", ""), reverse=True)
+        rows = []
+        if files:
+            f0 = files[0]
+            when = f0.get("uploaded_at", "")
+            try:
+                when = dt.datetime.fromisoformat(when.replace("Z", "+00:00")).astimezone(KST).strftime("%m/%d %H:%M")
+            except ValueError:
+                pass
+            rows.append(f"최신: **{f0.get('display', '')}** ({'β' if f0.get('type') == 'beta' else '정식'}, {when})")
+        for f in files:
+            ver = f.get("display", "").split()[-1]
+            beta = " β" if f.get("type") == "beta" else ""
+            rows.append(f"`v{ver}{beta}`  {f.get('downloads', 0)}회")
+        dl = w.get("downloads", {})
+        rows.append(f"_누적 {dl.get('total', 0)} · 이번 달 {dl.get('monthly', 0)}_")
+        fields.append({"name": f"{name} (CFWidget)", "value": "\n".join(rows)[:1024], "inline": True})
+    return fields
+
+
 def read_counts():
     # 공식 API의 파일(버전)별 downloadCount는 갱신이 며칠씩 늦어 기록하지 않는다.
     # 버전별 숫자는 크롬으로 Author Console을 읽는 채팅 조회 때만 기록한다.
@@ -76,7 +112,8 @@ def dashboard(h, betas):
         "title": f"📦 CurseForge 다운로드 · {last['at'][:10]} {last['at'][11:16]}",
         "url": "https://hyveo.github.io/addons/", "color": 0x3FB950,
         "description": desc,
-        "footer": {"text": "참조 API: CurseForge Core API · GET https://api.curseforge.com/v1/mods/{id} (downloadCount)\n아침 자동 리포트 · 버전별 숫자와 리워드 포인트는 채팅에서 조회할 때 확인돼요"}}]}
+        "fields": cfwidget_fields(names),
+        "footer": {"text": "참조 API: 숫자 요약 = CurseForge Core API (GET https://api.curseforge.com/v1/mods/{id}) · 애드온별 칸 = CFWidget (GET https://api.cfwidget.com/{id})\nCFWidget의 버전별 숫자는 갱신이 늦어 실제보다 적을 수 있어요 · 정확한 버전별 숫자와 리워드 포인트는 채팅에서 조회할 때 확인돼요"}}]}
     req = urllib.request.Request(hook + ("&" if "?" in hook else "?") + "wait=true",
                                  data=json.dumps(payload).encode("utf-8"),
                                  headers={"Content-Type": "application/json",
