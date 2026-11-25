@@ -16,6 +16,7 @@ last = h[-1]
 prev = h[-2] if len(h) > 1 else None
 today = last["at"][:10]
 day0 = next((r for r in reversed(h) if r["at"][:10] < today), None)
+day0v = next((r for r in reversed(h) if r["at"][:10] < today and r.get("versions")), None)
 
 
 def change(now, before):
@@ -36,18 +37,18 @@ for k, name in names.items():
     v = (last.get("versions") or {}).get(k)
     pv = ((prev or {}).get("versions") or {}).get(k)
     if v:
-        dv = None if day0 is None else (day0.get("versions") or {}).get(k, {})
+        dv = None if day0v is None else day0v["versions"].get(k, {})
         rows = []
         for ver, n in v.items():
             bits = []
-            if pv is not None and prev is not day0 and n - pv.get(ver, 0) > 0:
+            if pv is not None and prev is not day0v and n - pv.get(ver, 0) > 0:
                 bits.append(f"+{n - pv.get(ver, 0)}")
             if dv is not None and n - dv.get(ver, 0) > 0:
                 bits.append(f"오늘 +{n - dv.get(ver, 0)}")
             rows.append(f"`v{ver}`  **{n:,}**회" + (f"  ({' · '.join(bits)})" if bits else ""))
         value = "\n".join(rows)
     else:
-        value = "버전별 기록 없음"
+        value = "버전별 숫자는 수동 조회 때 기록돼요"
     fields.append({"name": head, "value": value, "inline": True})
 
 t = total(last)

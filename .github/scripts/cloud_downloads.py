@@ -28,21 +28,9 @@ def api(path):
 
 
 def read_counts():
-    entry, betas = {}, set()
-    versions = {}
-    for slug, pid in PROJECTS.items():
-        entry[slug] = int(api(f"/v1/mods/{pid}")["downloadCount"])
-        files = api(f"/v1/mods/{pid}/files?pageSize=50")
-        files.sort(key=lambda f: f.get("fileDate", ""), reverse=True)
-        v = {}
-        for f in files:
-            ver = (f.get("displayName") or f.get("fileName", "")).replace(".zip", "").split()[-1].split("-")[-1]
-            v[ver] = v.get(ver, 0) + int(f.get("downloadCount", 0))
-            if f.get("releaseType") == 2:
-                betas.add((slug, ver))
-        versions[slug] = v
-    entry["versions"] = versions
-    return entry, betas
+    # 공식 API의 파일(버전)별 downloadCount는 갱신이 며칠씩 늦어 기록하지 않는다.
+    # 버전별 숫자는 크롬으로 Author Console을 읽는 채팅 조회 때만 기록한다.
+    return {slug: int(api(f"/v1/mods/{pid}")["downloadCount"]) for slug, pid in PROJECTS.items()}, set()
 
 
 def append(entry):
@@ -84,34 +72,11 @@ def dashboard(h, betas):
         b, partial = base_for(h, start)
         parts = " · ".join(f"{names[k]} +{last[k] - b.get(k, 0)}" for k in names)
         desc += f"\n{label}: {parts} · 합계 **+{tot(last) - tot(b)}**" + (" _(첫 배포부터)_" if partial else "")
-    pv_all = prev.get("versions") or {}
-    dv_all = day0.get("versions") or {}
-    fields = []
-    for k, name in names.items():
-        v = last["versions"][k]
-        pv, dv = pv_all.get(k), dv_all.get(k, {})
-        rows = []
-        for ver, n in v.items():
-            bits = []
-            if pv is not None and prev is not day0:
-                if ver not in pv:
-                    bits.append("새 버전")
-                elif n - pv[ver] > 0:
-                    bits.append(f"+{n - pv[ver]}")
-            if n - dv.get(ver, 0) > 0:
-                bits.append(f"오늘 +{n - dv.get(ver, 0)}")
-            beta = " β" if (k, ver) in betas else ""
-            rows.append(f"`v{ver}{beta}`  **{n}**회" + (f"  ({' · '.join(bits)})" if bits else ""))
-        s = sum(v.values())
-        if s != last[k]:
-            rows.append(f"_버전별 합 {s} (전체와 {abs(last[k] - s)} 차이)_")
-        fields.append({"name": f"{name} — {last[k]}회 ({sign(last[k] - prev.get(k, 0))})",
-                       "value": "\n".join(rows)[:1024], "inline": True})
     payload = {"username": "CurseForge Dashboard", "embeds": [{
         "title": f"📦 CurseForge 다운로드 · {last['at'][:10]} {last['at'][11:16]}",
         "url": "https://hyveo.github.io/addons/", "color": 0x3FB950,
-        "description": desc, "fields": fields,
-        "footer": {"text": "아침 자동 리포트 · 리워드 포인트는 채팅에서 조회할 때만 확인돼요"}}]}
+        "description": desc,
+        "footer": {"text": "아침 자동 리포트 · 버전별 숫자와 리워드 포인트는 채팅에서 조회할 때 확인돼요"}}]}
     req = urllib.request.Request(hook + ("&" if "?" in hook else "?") + "wait=true",
                                  data=json.dumps(payload).encode("utf-8"),
                                  headers={"Content-Type": "application/json",

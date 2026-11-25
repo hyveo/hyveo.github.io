@@ -150,9 +150,10 @@ footer a{color:#9198A1}
     var vlast=null,vprev=null;for(var i=h.length-1;i>=0;i--){if(h[i].versions){if(!vlast)vlast=h[i];else{vprev=h[i];break;}}}
     document.querySelectorAll('[data-dl-versions]').forEach(function(w){
       var k=w.getAttribute('data-dl-versions'),v=vlast&&vlast.versions[k];if(!v)return;
-      var pv=vprev&&vprev!==day0?vprev.versions[k]:null;
       var t=document.createElement('table');t.className='vt mono';
-      var dv=day0&&day0.versions?day0.versions[k]||{}:(day0?{}:null);
+      var dvr=null;for(var z=h.length-1;z>=0;z--){if(h[z].at.slice(0,10)<today&&h[z].versions){dvr=h[z];break;}}
+      var dv=dvr?dvr.versions[k]||{}:null;
+      var pv=vprev&&vprev!==dvr?vprev.versions[k]:null;
       var hr=document.createElement('tr');['버전','다운로드',pv?'변화':'',dv?'오늘':''].forEach(function(x){if(x==='')return;var th=document.createElement('th');th.textContent=x;hr.appendChild(th);});t.appendChild(hr);
       Object.keys(v).forEach(function(ver){var tr=document.createElement('tr');
         var a=document.createElement('td');a.textContent=ver;tr.appendChild(a);
