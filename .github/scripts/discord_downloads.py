@@ -16,7 +16,22 @@ try:
     META = json.load(open("public/addons/files.json", encoding="utf-8")).get("files", {})
 except (OSError, ValueError):
     META = {}
-TYPE_KO = {"R": "R", "B": "B", "A": "A"}
+TYPE_KO = {"R": "[R]", "B": "[B]", "A": "[A]"}
+
+def pick_versions(vers, meta, n=3):
+    """최신순으로, 업로드 날짜가 서로 다른 버전 n개 (같은 날짜면 가장 최신 버전 하나)."""
+    order = sorted(vers, key=lambda v: meta.get(v, {}).get("uploaded", ""), reverse=True) if meta else list(vers)
+    out, days = [], set()
+    for v in order:
+        day = meta.get(v, {}).get("uploaded", v)[:10]
+        if day in days:
+            continue
+        days.add(day)
+        out.append(v)
+        if len(out) == n:
+            break
+    return out
+
 last = h[-1]
 prev = h[-2] if len(h) > 1 else None
 today = last["at"][:10]
@@ -45,7 +60,8 @@ for k, name in names.items():
     if v:
         dv = None if day0v is None else day0v["versions"].get(k, {})
         rows = []
-        for ver, n in v.items():
+        for ver in pick_versions(v, META.get(k, {})):
+            n = v[ver]
             bits = []
             if pv is not None and pvr is not day0v and n - pv.get(ver, 0) > 0:
                 bits.append(f"+{n - pv.get(ver, 0)}")

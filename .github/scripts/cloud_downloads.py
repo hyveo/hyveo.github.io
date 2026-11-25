@@ -14,7 +14,22 @@ import urllib.request
 PROJECTS = {"centerbar": 1814948, "levelpace": 1814884, "hyveo-center": 1814965}
 PATH = "public/addons/downloads.json"
 FILES_PATH = "public/addons/files.json"
-TYPE_KO = {"R": "R", "B": "B", "A": "A"}
+TYPE_KO = {"R": "[R]", "B": "[B]", "A": "[A]"}
+
+
+def pick_versions(vers, meta, n=3):
+    """최신순으로, 업로드 날짜가 서로 다른 버전 n개 (같은 날짜면 가장 최신 버전 하나)."""
+    order = sorted(vers, key=lambda v: meta.get(v, {}).get("uploaded", ""), reverse=True) if meta else list(vers)
+    out, days = [], set()
+    for v in order:
+        day = meta.get(v, {}).get("uploaded", v)[:10]
+        if day in days:
+            continue
+        days.add(day)
+        out.append(v)
+        if len(out) == n:
+            break
+    return out
 KST = dt.timezone(dt.timedelta(hours=9))
 
 
@@ -41,9 +56,10 @@ def version_fields(h, names):
         f0 = latest.get(k)
         if f0:
             when = dt.datetime.fromisoformat(f0["at"].replace("Z", "+00:00")).astimezone(KST).strftime("%m/%d %H:%M")
-            rows.append(f"최신: **{f0['name']}** ({'B' if f0['beta'] else 'R'}, {when})")
+            rows.append(f"최신: **{f0['name']}** ([{'B' if f0['beta'] else 'R'}], {when})")
         if vers and k in vers:
-            for v, n in vers[k].items():
+            for v in pick_versions(vers[k], meta.get(k, {})):
+                n = vers[k][v]
                 diff = n - pv.get(k, {}).get(v, 0)
                 m = meta.get(k, {}).get(v, {})
                 tag = f" {TYPE_KO.get(m.get('type'), '')} · {m['uploaded'][5:10].replace('-', '/')}" if m else ""

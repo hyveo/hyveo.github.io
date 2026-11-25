@@ -141,7 +141,7 @@ footer a{color:#9198A1}
   var url=document.currentScript.getAttribute('data-src');
   function n(x){return Number(x||0).toLocaleString('ko-KR');}
   function el(tag,attrs,text){var e=document.createElementNS('http://www.w3.org/2000/svg',tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;return e;}
-  var TK={"R":"R","B":"B","A":"A"},TN={"R":"정식","B":"베타","A":"알파"};
+  var TK={"R":"[R]","B":"[B]","A":"[A]"},TN={"R":"정식","B":"베타","A":"알파"};
   Promise.all([fetch(url,{cache:'no-cache'}).then(function(r){return r.json();}),
     fetch(url.replace('downloads.json','files.json'),{cache:'no-cache'}).then(function(r){return r.ok?r.json():{};}).catch(function(){return {};})
   ]).then(function(rs){var d=rs[0],FM=(rs[1]||{}).files||{};
