@@ -58,6 +58,7 @@
                   "levelpace": {"1.2.0": 6, "1.1.0": 11, "1.0.3": 7, "1.0.2": 4, "1.0.1": 2},
                   "hyveo-center": {"1.1.0": 4, "1.0.0": 8, "0.1.0": 2}}},
     {"at": "2026-11-25T14:57+09:00", "centerbar": 121, "levelpace": 30, "hyveo-center": 15},
-    {"at": "2026-11-25T15:00+09:00", "centerbar": 121, "levelpace": 30, "hyveo-center": 15}
+    {"at": "2026-11-25T15:00+09:00", "centerbar": 121, "levelpace": 30, "hyveo-center": 15},
+    {"at": "2026-11-25T15:02+09:00", "centerbar": 121, "levelpace": 30, "hyveo-center": 15}
   ]
 }
