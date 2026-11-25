@@ -14,6 +14,8 @@ names = d["addons"]
 h = d["history"]
 last = h[-1]
 prev = h[-2] if len(h) > 1 else None
+today = last["at"][:10]
+day0 = next((r for r in reversed(h) if r["at"][:10] < today), None)
 
 
 def change(now, before):
@@ -34,7 +36,15 @@ for k, name in names.items():
     v = (last.get("versions") or {}).get(k)
     pv = ((prev or {}).get("versions") or {}).get(k)
     if v:
-        rows = [f"`v{ver}`  **{n:,}**회" + change(n, None if pv is None else pv.get(ver, 0)) for ver, n in v.items()]
+        dv = None if day0 is None else (day0.get("versions") or {}).get(k, {})
+        rows = []
+        for ver, n in v.items():
+            bits = []
+            if pv is not None and prev is not day0 and n - pv.get(ver, 0) > 0:
+                bits.append(f"+{n - pv.get(ver, 0)}")
+            if dv is not None and n - dv.get(ver, 0) > 0:
+                bits.append(f"오늘 +{n - dv.get(ver, 0)}")
+            rows.append(f"`v{ver}`  **{n:,}**회" + (f"  ({' · '.join(bits)})" if bits else ""))
         value = "\n".join(rows)
     else:
         value = "버전별 기록 없음"
@@ -42,6 +52,9 @@ for k, name in names.items():
 
 t = total(last)
 desc = f"전체 **{t:,}회**" + change(t, total(prev) if prev else None)
+if day0 is not None:
+    parts = " · ".join(f"{names[k]} +{last.get(k, 0) - day0.get(k, 0)}" for k in names)
+    desc += f"\n📅 오늘({today[5:7]}/{today[8:10]}) 누적: {parts} · 합계 **+{t - total(day0)}**"
 payload = {
     "username": "hyveo addons",
     "embeds": [{

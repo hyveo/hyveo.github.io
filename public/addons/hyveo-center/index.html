@@ -143,17 +143,20 @@ footer a{color:#9198A1}
   fetch(url,{cache:'no-cache'}).then(function(r){return r.json();}).then(function(d){
     var h=d.history||[];if(!h.length)return;
     var last=h[h.length-1],prev=h.length>1?h[h.length-2]:null,keys=Object.keys(d.addons||{});
+    var today=last.at.slice(0,10),day0=null;for(var q=h.length-1;q>=0;q--){if(h[q].at.slice(0,10)<today){day0=h[q];break;}}
     document.querySelectorAll('[data-dl]').forEach(function(b){var k=b.getAttribute('data-dl');if(last[k]==null)return;b.textContent='다운로드 '+n(last[k]);b.hidden=false;});
     var vlast=null,vprev=null;for(var i=h.length-1;i>=0;i--){if(h[i].versions){if(!vlast)vlast=h[i];else{vprev=h[i];break;}}}
     document.querySelectorAll('[data-dl-versions]').forEach(function(w){
       var k=w.getAttribute('data-dl-versions'),v=vlast&&vlast.versions[k];if(!v)return;
-      var pv=vprev&&vprev.versions[k];
+      var pv=vprev&&vprev!==day0?vprev.versions[k]:null;
       var t=document.createElement('table');t.className='vt mono';
-      var hr=document.createElement('tr');['버전','다운로드',pv?'변화':''].forEach(function(x){if(x==='')return;var th=document.createElement('th');th.textContent=x;hr.appendChild(th);});t.appendChild(hr);
+      var dv=day0&&day0.versions?day0.versions[k]||{}:(day0?{}:null);
+      var hr=document.createElement('tr');['버전','다운로드',pv?'변화':'',dv?'오늘':''].forEach(function(x){if(x==='')return;var th=document.createElement('th');th.textContent=x;hr.appendChild(th);});t.appendChild(hr);
       Object.keys(v).forEach(function(ver){var tr=document.createElement('tr');
         var a=document.createElement('td');a.textContent=ver;tr.appendChild(a);
         var b=document.createElement('td');b.textContent=n(v[ver]);tr.appendChild(b);
-        if(pv){var c=document.createElement('td');var dv=v[ver]-(pv[ver]||0);c.textContent=(dv>0?'+':'')+n(dv);if(dv>0)c.className='up';tr.appendChild(c);}
+        if(pv){var c=document.createElement('td');var dd=v[ver]-(pv[ver]||0);c.textContent=(dd>0?'+':'')+n(dd);if(dd>0)c.className='up';tr.appendChild(c);}
+        if(dv){var c2=document.createElement('td');var dt=v[ver]-(dv[ver]||0);c2.textContent=(dt>0?'+':'')+n(dt);if(dt>0)c2.className='up';tr.appendChild(c2);}
         t.appendChild(tr);});
       var tgt=w.querySelector('.vbody')||w;tgt.textContent='';tgt.appendChild(t);
       var when=w.querySelector('.vwhen');if(when)when.textContent=vlast.at.slice(0,10)+' 기준';
@@ -168,6 +171,7 @@ footer a{color:#9198A1}
       var l=document.createElement('span');l.className='muted';l.textContent=p[1];
       var b=document.createElement('b');b.textContent=n(v);
       c.appendChild(l);c.appendChild(b);
+      if(day0){var dv0=p[0]==='total'?total(day0):(day0[p[0]]||0);var td=document.createElement('span');td.className='up mono';td.style.fontWeight='700';td.textContent='오늘 +'+n(v-dv0);c.appendChild(td);}
       if(pv!=null){var u=document.createElement('span');u.className='up mono';u.textContent=(v-pv>=0?'+':'')+n(v-pv)+' 지난 기록 대비';c.appendChild(u);}
       stats.appendChild(c);
     });
