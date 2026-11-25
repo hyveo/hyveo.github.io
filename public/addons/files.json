@@ -1,0 +1,125 @@
+{
+  "updated": "2026-11-25T16:33+09:00",
+  "files": {
+    "centerbar": {
+      "1.7.2": {
+        "type": "B",
+        "uploaded": "2026-11-25 03:36",
+        "size": 43244,
+        "file": "CenterBar-1.7.2.zip"
+      },
+      "1.7.1": {
+        "type": "B",
+        "uploaded": "2026-11-25 01:55",
+        "size": 43001,
+        "file": "CenterBar-1.7.1.zip"
+      },
+      "1.7.0": {
+        "type": "B",
+        "uploaded": "2026-11-25 01:27",
+        "size": 42482,
+        "file": "CenterBar-1.7.0.zip"
+      },
+      "1.6.0": {
+        "type": "B",
+        "uploaded": "2026-11-25 01:13",
+        "size": 35695,
+        "file": "CenterBar-1.6.0.zip"
+      },
+      "1.5.1": {
+        "type": "R",
+        "uploaded": "2026-11-23 00:19",
+        "size": 33856,
+        "file": "CenterBar-1.5.1.zip"
+      },
+      "1.5.0": {
+        "type": "R",
+        "uploaded": "2026-11-21 05:05",
+        "size": 32835,
+        "file": "CenterBar-1.5.0.zip"
+      },
+      "1.4.1": {
+        "type": "R",
+        "uploaded": "2026-11-21 04:35",
+        "size": 32383,
+        "file": "CenterBar-1.4.1.zip"
+      },
+      "1.3.7": {
+        "type": "R",
+        "uploaded": "2026-11-19 21:51",
+        "size": 22924,
+        "file": "CenterBar-1.3.7.zip"
+      },
+      "1.3.6": {
+        "type": "R",
+        "uploaded": "2026-11-19 21:40",
+        "size": 22713,
+        "file": "CenterBar-1.3.6.zip"
+      },
+      "1.3.5": {
+        "type": "R",
+        "uploaded": "2026-11-19 03:28",
+        "size": 22359,
+        "file": "CenterBar-1.3.5.zip"
+      },
+      "1.0.0": {
+        "type": "R",
+        "uploaded": "2026-11-19 01:53",
+        "size": 13313,
+        "file": "CenterBar-1.0.0.zip"
+      }
+    },
+    "levelpace": {
+      "1.2.0": {
+        "type": "B",
+        "uploaded": "2026-11-25 01:27",
+        "size": 27497,
+        "file": "LevelPace-1.2.0.zip"
+      },
+      "1.1.0": {
+        "type": "R",
+        "uploaded": "2026-11-21 05:05",
+        "size": 20696,
+        "file": "LevelPace-1.1.0.zip"
+      },
+      "1.0.3": {
+        "type": "R",
+        "uploaded": "2026-11-20 22:35",
+        "size": 15252,
+        "file": "LevelPace-1.0.3.zip"
+      },
+      "1.0.2": {
+        "type": "R",
+        "uploaded": "2026-11-20 22:30",
+        "size": 14401,
+        "file": "LevelPace-1.0.2.zip"
+      },
+      "1.0.1": {
+        "type": "R",
+        "uploaded": "2026-11-19 01:38",
+        "size": 13783,
+        "file": "LevelPace-1.0.1.zip"
+      }
+    },
+    "hyveo-center": {
+      "1.1.0": {
+        "type": "B",
+        "uploaded": "2026-11-25 01:28",
+        "size": 27288,
+        "file": "HyveoCenter-1.1.0.zip"
+      },
+      "1.0.0": {
+        "type": "R",
+        "uploaded": "2026-11-21 05:05",
+        "size": 20482,
+        "file": "HyveoCenter-1.0.0.zip"
+      },
+      "0.1.0": {
+        "type": "R",
+        "uploaded": "2026-11-19 02:07",
+        "size": 11902,
+        "file": "HyveoCenter-0.1.0.zip"
+      }
+    }
+  }
+}
