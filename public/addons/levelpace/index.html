@@ -177,6 +177,22 @@ footer a{color:#9198A1}
       if(pv!=null){var u=document.createElement('span');u.className='up mono';u.textContent=(v-pv>=0?'+':'')+n(v-pv)+' 지난 기록 대비';c.appendChild(u);}
       stats.appendChild(c);
     });
+    var periods=box.querySelector('.periods');
+    if(periods){
+      var y=+today.slice(0,4),mo=+today.slice(5,7),dd=+today.slice(8,10);
+      var dow=new Date(Date.UTC(y,mo-1,dd)).getUTCDay(),mon=new Date(Date.UTC(y,mo-1,dd-((dow+6)%7))).toISOString().slice(0,10);
+      var monthStart=today.slice(0,8)+'01';
+      function baseFor(start){for(var q=h.length-1;q>=0;q--){if(h[q].at.slice(0,10)<start)return {r:h[q],partial:false};}return {r:{},partial:true};}
+      var rows=[['오늘',baseFor(today)],['이번 주 ('+mon.slice(5).replace('-','/')+'~)',baseFor(mon)],['이번 달 ('+mo+'월)',baseFor(monthStart)]];
+      var t=document.createElement('table');t.className='vt mono';
+      var hr=document.createElement('tr');['기간','전체'].concat(keys.map(function(k){return d.addons[k];})).forEach(function(x){var th=document.createElement('th');th.textContent=x;hr.appendChild(th);});t.appendChild(hr);
+      var note=false;
+      rows.forEach(function(rw){var b=rw[1].r;var tr=document.createElement('tr');var a=document.createElement('td');a.textContent=rw[0]+(rw[1].partial?' *':'');if(rw[1].partial)note=true;tr.appendChild(a);
+        [total(last)-total(b)].concat(keys.map(function(k){return (last[k]||0)-(b[k]||0);})).forEach(function(v2){var c=document.createElement('td');c.textContent='+'+n(v2);if(v2>0)c.className='up';tr.appendChild(c);});t.appendChild(tr);});
+      periods.textContent='';periods.appendChild(t);
+      if(note){var nt=document.createElement('p');nt.className='muted';nt.style.fontSize='12px';nt.textContent='* 이 기간 시작 전 기록이 없어 첫 배포부터의 누적으로 계산했어요.';periods.appendChild(nt);}
+      periods.hidden=false;
+    }
     box.querySelector('.when').textContent=last.at.slice(0,10)+' 기준 · CurseForge 누적 다운로드';
     var wrap=box.querySelector('.chart');
     function draw(){

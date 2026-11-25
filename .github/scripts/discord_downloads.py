@@ -52,9 +52,26 @@ for k, name in names.items():
 
 t = total(last)
 desc = f"전체 **{t:,}회**" + change(t, total(prev) if prev else None)
-if day0 is not None:
-    parts = " · ".join(f"{names[k]} +{last.get(k, 0) - day0.get(k, 0)}" for k in names)
-    desc += f"\n📅 오늘({today[5:7]}/{today[8:10]}) 누적: {parts} · 합계 **+{t - total(day0)}**"
+import datetime as _dt
+
+
+def base_for(start):
+    for r in reversed(h):
+        if r["at"][:10] < start:
+            return r, False
+    return {}, True
+
+
+_d = _dt.date.fromisoformat(today)
+_mon = (_d - _dt.timedelta(days=_d.weekday())).isoformat()
+_month = today[:8] + "01"
+for label, start in ((f"📅 오늘({today[5:7]}/{today[8:10]})", today),
+                     (f"📆 이번 주({_mon[5:7]}/{_mon[8:10]}~)", _mon),
+                     (f"🗓 이번 달({int(today[5:7])}월)", _month)):
+    b, partial = base_for(start)
+    parts = " · ".join(f"{names[k]} +{last.get(k, 0) - b.get(k, 0)}" for k in names)
+    tail = " _(첫 배포부터)_" if partial else ""
+    desc += f"\n{label}: {parts} · 합계 **+{t - total(b)}**{tail}"
 payload = {
     "username": "hyveo addons",
     "embeds": [{
