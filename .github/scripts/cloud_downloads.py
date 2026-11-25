@@ -1,4 +1,4 @@
-"""매일 아침 CurseForge 공식 API로 다운로드 수를 읽어 downloads.json에 기록하고,
+"""매일 아침 CurseForge 공식 API와 공개 파일 목록으로 다운로드 수를 읽어 downloads.json에 기록하고,
 디스코드 Dashboard 채널로 리포트를 보낸다. (GitHub Actions에서 실행)
 
 필요한 시크릿
@@ -27,46 +27,62 @@ def api(path):
         return json.load(r)["data"]
 
 
-def cfwidget(pid):
-    req = urllib.request.Request(f"https://api.cfwidget.com/{pid}",
-                                 headers={"Accept": "application/json",
-                                          "User-Agent": "hyveo-addons-bot (https://hyveo.github.io)"})
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return json.load(r)
-
-
-def cfwidget_fields(names):
+def version_fields(h, names):
+    last = h[-1]
+    vers = last.get("versions")
+    latest = json.load(open("/tmp/latest.json")) if os.path.exists("/tmp/latest.json") else {}
+    pv = next((r["versions"] for r in reversed(h[:-1]) if r.get("versions")), {})
     fields = []
     for k, name in names.items():
-        try:
-            w = cfwidget(PROJECTS[k])
-        except Exception as e:  # noqa: BLE001
-            fields.append({"name": f"{name} (CFWidget)", "value": f"불러오지 못했어요: {e}"[:200], "inline": True})
-            continue
-        files = sorted(w.get("files", []), key=lambda f: f.get("uploaded_at", ""), reverse=True)
         rows = []
-        if files:
-            f0 = files[0]
-            when = f0.get("uploaded_at", "")
-            try:
-                when = dt.datetime.fromisoformat(when.replace("Z", "+00:00")).astimezone(KST).strftime("%m/%d %H:%M")
-            except ValueError:
-                pass
-            rows.append(f"최신: **{f0.get('display', '')}** ({'β' if f0.get('type') == 'beta' else '정식'}, {when})")
-        for f in files:
-            ver = f.get("display", "").split()[-1]
-            beta = " β" if f.get("type") == "beta" else ""
-            rows.append(f"`v{ver}{beta}`  {f.get('downloads', 0)}회")
-        dl = w.get("downloads", {})
-        rows.append(f"_누적 {dl.get('total', 0)} · 이번 달 {dl.get('monthly', 0)}_")
-        fields.append({"name": f"{name} (CFWidget)", "value": "\n".join(rows)[:1024], "inline": True})
+        f0 = latest.get(k)
+        if f0:
+            when = dt.datetime.fromisoformat(f0["at"].replace("Z", "+00:00")).astimezone(KST).strftime("%m/%d %H:%M")
+            rows.append(f"최신: **{f0['name']}** ({'β' if f0['beta'] else '정식'}, {when})")
+        if vers and k in vers:
+            for v, n in vers[k].items():
+                diff = n - pv.get(k, {}).get(v, 0)
+                rows.append(f"`v{v}`  **{n}**회" + (f"  (+{diff})" if diff else ""))
+        else:
+            rows.append("버전별 숫자를 읽지 못했어요")
+        fields.append({"name": name, "value": "\n".join(rows)[:1024], "inline": True})
     return fields
 
 
+def site_files(pid):
+    """curseforge.com 공개 파일 목록(로그인 불필요)이 쓰는 JSON. 버전별 totalDownloads가 Author Console과 같다."""
+    out, page = [], 0
+    while True:
+        req = urllib.request.Request(
+            f"https://www.curseforge.com/api/v1/mods/{pid}/files?pageIndex={page}&pageSize=50&removeAlphas=false",
+            headers={"Accept": "application/json", "User-Agent": "hyveo-addons-bot (https://hyveo.github.io)"})
+        with urllib.request.urlopen(req, timeout=30) as r:
+            d = json.load(r)
+        out += d.get("data", [])
+        total = d.get("pagination", {}).get("totalCount", len(out))
+        if len(out) >= total or not d.get("data"):
+            return out
+        page += 1
+
+
 def read_counts():
-    # 공식 API의 파일(버전)별 downloadCount는 갱신이 며칠씩 늦어 기록하지 않는다.
-    # 버전별 숫자는 크롬으로 Author Console을 읽는 채팅 조회 때만 기록한다.
-    return {slug: int(api(f"/v1/mods/{pid}")["downloadCount"]) for slug, pid in PROJECTS.items()}, set()
+    # 합계는 Core API, 버전별 숫자는 curseforge.com 공개 파일 목록에서 읽는다.
+    # (Core API·CFWidget의 파일별 숫자는 갱신이 며칠씩 늦어 쓰지 않는다)
+    entry = {slug: int(api(f"/v1/mods/{pid}")["downloadCount"]) for slug, pid in PROJECTS.items()}
+    versions, latest = {}, {}
+    try:
+        for slug, pid in PROJECTS.items():
+            files = sorted(site_files(pid), key=lambda f: f["dateCreated"], reverse=True)
+            versions[slug] = {f["displayName"].split()[-1]: int(f["totalDownloads"]) for f in files}
+            if files:
+                latest[slug] = {"name": files[0]["displayName"], "beta": files[0]["releaseType"] != 1,
+                                "at": files[0]["dateCreated"]}
+        entry["versions"] = versions
+    except Exception as e:  # noqa: BLE001  사이트가 막히면 합계만 기록
+        print("버전별 숫자 읽기 실패, 합계만 기록:", e)
+        latest = {}
+    json.dump(latest, open("/tmp/latest.json", "w"), ensure_ascii=False)
+    return entry, set()
 
 
 def append(entry):
@@ -112,8 +128,8 @@ def dashboard(h, betas):
         "title": f"📦 CurseForge 다운로드 · {last['at'][:10]} {last['at'][11:16]}",
         "url": "https://hyveo.github.io/addons/", "color": 0x3FB950,
         "description": desc,
-        "fields": cfwidget_fields(names),
-        "footer": {"text": "참조 API: 숫자 요약 = CurseForge Core API (GET https://api.curseforge.com/v1/mods/{id}) · 애드온별 칸 = CFWidget (GET https://api.cfwidget.com/{id})\nCFWidget의 버전별 숫자는 갱신이 늦어 실제보다 적을 수 있어요 · 정확한 버전별 숫자와 리워드 포인트는 채팅에서 조회할 때 확인돼요"}}]}
+        "fields": version_fields(h, names),
+        "footer": {"text": "참조 API: 합계 = CurseForge Core API (GET https://api.curseforge.com/v1/mods/{id}) · 버전별 = curseforge.com 공개 파일 목록 (GET https://www.curseforge.com/api/v1/mods/{id}/files)\n(+n)은 이전 버전별 기록과 비교 · 리워드 포인트는 채팅에서 조회할 때 확인돼요"}}]}
     req = urllib.request.Request(hook + ("&" if "?" in hook else "?") + "wait=true",
                                  data=json.dumps(payload).encode("utf-8"),
                                  headers={"Content-Type": "application/json",
