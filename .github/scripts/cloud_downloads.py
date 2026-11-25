@@ -14,7 +14,7 @@ import urllib.request
 PROJECTS = {"centerbar": 1814948, "levelpace": 1814884, "hyveo-center": 1814965}
 PATH = "public/addons/downloads.json"
 FILES_PATH = "public/addons/files.json"
-TYPE_KO = {"R": "정식", "B": "β", "A": "α"}
+TYPE_KO = {"R": "R", "B": "B", "A": "A"}
 KST = dt.timezone(dt.timedelta(hours=9))
 
 
@@ -41,7 +41,7 @@ def version_fields(h, names):
         f0 = latest.get(k)
         if f0:
             when = dt.datetime.fromisoformat(f0["at"].replace("Z", "+00:00")).astimezone(KST).strftime("%m/%d %H:%M")
-            rows.append(f"최신: **{f0['name']}** ({'β' if f0['beta'] else '정식'}, {when})")
+            rows.append(f"최신: **{f0['name']}** ({'B' if f0['beta'] else 'R'}, {when})")
         if vers and k in vers:
             for v, n in vers[k].items():
                 diff = n - pv.get(k, {}).get(v, 0)

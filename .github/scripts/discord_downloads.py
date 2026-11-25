@@ -16,7 +16,7 @@ try:
     META = json.load(open("public/addons/files.json", encoding="utf-8")).get("files", {})
 except (OSError, ValueError):
     META = {}
-TYPE_KO = {"R": "정식", "B": "β", "A": "α"}
+TYPE_KO = {"R": "R", "B": "B", "A": "A"}
 last = h[-1]
 prev = h[-2] if len(h) > 1 else None
 today = last["at"][:10]

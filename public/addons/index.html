@@ -54,7 +54,7 @@ h3{margin:0;font-size:17px;font-weight:700}
 .vt{width:100%;border-collapse:collapse;font-size:14px}
 .vt th,.vt td{padding:6px 4px;border-bottom:1px solid rgba(255,255,255,.08);text-align:right}
 .vt th:first-child,.vt td:first-child{text-align:left}
-.vt td.beta{color:#E3B341}
+.vt td.tR{color:#3FB950;font-weight:700}.vt td.tB{color:#E3B341;font-weight:700}.vt td.tA{color:#F85149;font-weight:700}
 .vt th{color:#9198A1;font-weight:500;font-size:12px}
 .vt .up{color:#3FB950}
 .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:#9198A1}
@@ -161,7 +161,7 @@ footer a{color:#9198A1}
   var url=document.currentScript.getAttribute('data-src');
   function n(x){return Number(x||0).toLocaleString('ko-KR');}
   function el(tag,attrs,text){var e=document.createElementNS('http://www.w3.org/2000/svg',tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;return e;}
-  var TK={"R":"정식","B":"베타","A":"알파"};
+  var TK={"R":"R","B":"B","A":"A"},TN={"R":"정식","B":"베타","A":"알파"};
   Promise.all([fetch(url,{cache:'no-cache'}).then(function(r){return r.json();}),
     fetch(url.replace('downloads.json','files.json'),{cache:'no-cache'}).then(function(r){return r.ok?r.json():{};}).catch(function(){return {};})
   ]).then(function(rs){var d=rs[0],FM=(rs[1]||{}).files||{};
@@ -180,7 +180,7 @@ footer a{color:#9198A1}
       var hr=document.createElement('tr');['버전',hasM?'타입':'',hasM?'업로드':'','다운로드',pv?'변화':'',dv?'오늘':''].forEach(function(x){if(x==='')return;var th=document.createElement('th');th.textContent=x;hr.appendChild(th);});t.appendChild(hr);
       Object.keys(v).forEach(function(ver){var tr=document.createElement('tr');
         var a=document.createElement('td');a.textContent=ver;tr.appendChild(a);
-        if(hasM){var m=fm[ver]||{};var ty=document.createElement('td');ty.textContent=TK[m.type]||'';if(m.type==='B')ty.className='beta';tr.appendChild(ty);
+        if(hasM){var m=fm[ver]||{};var ty=document.createElement('td');ty.textContent=TK[m.type]||'';ty.title=TN[m.type]||'';ty.className='t'+(m.type||'');tr.appendChild(ty);
           var up=document.createElement('td');up.textContent=m.uploaded?m.uploaded.slice(2,10).replace(/-/g,'.'):'';tr.appendChild(up);}
         var b=document.createElement('td');b.textContent=n(v[ver]);tr.appendChild(b);
         if(pv){var c=document.createElement('td');var dd=v[ver]-(pv[ver]||0);c.textContent=(dd>0?'+':'')+n(dd);if(dd>0)c.className='up';tr.appendChild(c);}
