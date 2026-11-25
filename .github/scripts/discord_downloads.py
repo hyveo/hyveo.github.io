@@ -12,6 +12,11 @@ if not hook:
 d = json.load(open("public/addons/downloads.json", encoding="utf-8"))
 names = d["addons"]
 h = d["history"]
+try:
+    META = json.load(open("public/addons/files.json", encoding="utf-8")).get("files", {})
+except (OSError, ValueError):
+    META = {}
+TYPE_KO = {"R": "정식", "B": "β", "A": "α"}
 last = h[-1]
 prev = h[-2] if len(h) > 1 else None
 today = last["at"][:10]
@@ -46,7 +51,9 @@ for k, name in names.items():
                 bits.append(f"+{n - pv.get(ver, 0)}")
             if dv is not None and n - dv.get(ver, 0) > 0:
                 bits.append(f"오늘 +{n - dv.get(ver, 0)}")
-            rows.append(f"`v{ver}`  **{n:,}**회" + (f"  ({' · '.join(bits)})" if bits else ""))
+            m = META.get(k, {}).get(ver, {})
+            tag = f" {TYPE_KO.get(m.get('type'), '')} · {m['uploaded'][5:10].replace('-', '/')}" if m else ""
+            rows.append(f"`v{ver}`{tag}  **{n:,}**회" + (f"  ({' · '.join(bits)})" if bits else ""))
         value = "\n".join(rows)
     else:
         value = "버전별 숫자를 이번엔 읽지 못했어요"

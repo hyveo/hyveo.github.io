@@ -54,6 +54,7 @@ h3{margin:0;font-size:17px;font-weight:700}
 .vt{width:100%;border-collapse:collapse;font-size:14px}
 .vt th,.vt td{padding:6px 4px;border-bottom:1px solid rgba(255,255,255,.08);text-align:right}
 .vt th:first-child,.vt td:first-child{text-align:left}
+.vt td.beta{color:#E3B341}
 .vt th{color:#9198A1;font-weight:500;font-size:12px}
 .vt .up{color:#3FB950}
 .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:#9198A1}
@@ -160,7 +161,10 @@ footer a{color:#9198A1}
   var url=document.currentScript.getAttribute('data-src');
   function n(x){return Number(x||0).toLocaleString('ko-KR');}
   function el(tag,attrs,text){var e=document.createElementNS('http://www.w3.org/2000/svg',tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;return e;}
-  fetch(url,{cache:'no-cache'}).then(function(r){return r.json();}).then(function(d){
+  var TK={"R":"정식","B":"베타","A":"알파"};
+  Promise.all([fetch(url,{cache:'no-cache'}).then(function(r){return r.json();}),
+    fetch(url.replace('downloads.json','files.json'),{cache:'no-cache'}).then(function(r){return r.ok?r.json():{};}).catch(function(){return {};})
+  ]).then(function(rs){var d=rs[0],FM=(rs[1]||{}).files||{};
     var h=d.history||[];if(!h.length)return;
     var last=h[h.length-1],prev=h.length>1?h[h.length-2]:null,keys=Object.keys(d.addons||{});
     var today=last.at.slice(0,10),day0=null;for(var q=h.length-1;q>=0;q--){if(h[q].at.slice(0,10)<today){day0=h[q];break;}}
@@ -172,9 +176,12 @@ footer a{color:#9198A1}
       var dvr=null;for(var z=h.length-1;z>=0;z--){if(h[z].at.slice(0,10)<today&&h[z].versions){dvr=h[z];break;}}
       var dv=dvr?dvr.versions[k]||{}:null;
       var pv=vprev&&vprev!==dvr?vprev.versions[k]:null;
-      var hr=document.createElement('tr');['버전','다운로드',pv?'변화':'',dv?'오늘':''].forEach(function(x){if(x==='')return;var th=document.createElement('th');th.textContent=x;hr.appendChild(th);});t.appendChild(hr);
+      var fm=FM[k]||{},hasM=Object.keys(fm).length>0;
+      var hr=document.createElement('tr');['버전',hasM?'타입':'',hasM?'업로드':'','다운로드',pv?'변화':'',dv?'오늘':''].forEach(function(x){if(x==='')return;var th=document.createElement('th');th.textContent=x;hr.appendChild(th);});t.appendChild(hr);
       Object.keys(v).forEach(function(ver){var tr=document.createElement('tr');
         var a=document.createElement('td');a.textContent=ver;tr.appendChild(a);
+        if(hasM){var m=fm[ver]||{};var ty=document.createElement('td');ty.textContent=TK[m.type]||'';if(m.type==='B')ty.className='beta';tr.appendChild(ty);
+          var up=document.createElement('td');up.textContent=m.uploaded?m.uploaded.slice(2,10).replace(/-/g,'.'):'';tr.appendChild(up);}
         var b=document.createElement('td');b.textContent=n(v[ver]);tr.appendChild(b);
         if(pv){var c=document.createElement('td');var dd=v[ver]-(pv[ver]||0);c.textContent=(dd>0?'+':'')+n(dd);if(dd>0)c.className='up';tr.appendChild(c);}
         if(dv){var c2=document.createElement('td');var dt=v[ver]-(dv[ver]||0);c2.textContent=(dt>0?'+':'')+n(dt);if(dt>0)c2.className='up';tr.appendChild(c2);}

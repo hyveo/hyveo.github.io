@@ -13,6 +13,8 @@ import urllib.request
 
 PROJECTS = {"centerbar": 1814948, "levelpace": 1814884, "hyveo-center": 1814965}
 PATH = "public/addons/downloads.json"
+FILES_PATH = "public/addons/files.json"
+TYPE_KO = {"R": "정식", "B": "β", "A": "α"}
 KST = dt.timezone(dt.timedelta(hours=9))
 
 
@@ -32,6 +34,7 @@ def version_fields(h, names):
     vers = last.get("versions")
     latest = json.load(open("/tmp/latest.json")) if os.path.exists("/tmp/latest.json") else {}
     pv = next((r["versions"] for r in reversed(h[:-1]) if r.get("versions")), {})
+    meta = json.load(open(FILES_PATH, encoding="utf-8")).get("files", {}) if os.path.exists(FILES_PATH) else {}
     fields = []
     for k, name in names.items():
         rows = []
@@ -42,7 +45,9 @@ def version_fields(h, names):
         if vers and k in vers:
             for v, n in vers[k].items():
                 diff = n - pv.get(k, {}).get(v, 0)
-                rows.append(f"`v{v}`  **{n}**회" + (f"  (+{diff})" if diff else ""))
+                m = meta.get(k, {}).get(v, {})
+                tag = f" {TYPE_KO.get(m.get('type'), '')} · {m['uploaded'][5:10].replace('-', '/')}" if m else ""
+                rows.append(f"`v{v}`{tag}  **{n}**회" + (f"  (+{diff})" if diff else ""))
         else:
             rows.append("버전별 숫자를 읽지 못했어요")
         fields.append({"name": name, "value": "\n".join(rows)[:1024], "inline": True})
@@ -69,15 +74,21 @@ def read_counts():
     # 합계는 Core API, 버전별 숫자는 curseforge.com 공개 파일 목록에서 읽는다.
     # (Core API·CFWidget의 파일별 숫자는 갱신이 며칠씩 늦어 쓰지 않는다)
     entry = {slug: int(api(f"/v1/mods/{pid}")["downloadCount"]) for slug, pid in PROJECTS.items()}
-    versions, latest = {}, {}
+    versions, latest, meta = {}, {}, {}
     try:
         for slug, pid in PROJECTS.items():
             files = sorted(site_files(pid), key=lambda f: f["dateCreated"], reverse=True)
             versions[slug] = {f["displayName"].split()[-1]: int(f["totalDownloads"]) for f in files}
+            meta[slug] = {f["displayName"].split()[-1]: {
+                "type": {1: "R", 2: "B", 3: "A"}.get(f["releaseType"], "?"),
+                "uploaded": dt.datetime.fromisoformat(f["dateCreated"].replace("Z", "+00:00")).astimezone(KST).strftime("%Y-%m-%d %H:%M"),
+                "size": int(f.get("fileLength", 0)), "file": f.get("fileName", "")} for f in files}
             if files:
                 latest[slug] = {"name": files[0]["displayName"], "beta": files[0]["releaseType"] != 1,
                                 "at": files[0]["dateCreated"]}
         entry["versions"] = versions
+        json.dump({"updated": dt.datetime.now(KST).strftime("%Y-%m-%dT%H:%M+09:00"), "files": meta},
+                  open(FILES_PATH, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
     except Exception as e:  # noqa: BLE001  사이트가 막히면 합계만 기록
         print("버전별 숫자 읽기 실패, 합계만 기록:", e)
         latest = {}
