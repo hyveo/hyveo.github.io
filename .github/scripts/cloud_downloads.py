@@ -76,7 +76,7 @@ def dashboard(h, betas):
         "title": f"📦 CurseForge 다운로드 · {last['at'][:10]} {last['at'][11:16]}",
         "url": "https://hyveo.github.io/addons/", "color": 0x3FB950,
         "description": desc,
-        "footer": {"text": "아침 자동 리포트 · 버전별 숫자와 리워드 포인트는 채팅에서 조회할 때 확인돼요"}}]}
+        "footer": {"text": "참조 API: CurseForge Core API · GET https://api.curseforge.com/v1/mods/{id} (downloadCount)\n아침 자동 리포트 · 버전별 숫자와 리워드 포인트는 채팅에서 조회할 때 확인돼요"}}]}
     req = urllib.request.Request(hook + ("&" if "?" in hook else "?") + "wait=true",
                                  data=json.dumps(payload).encode("utf-8"),
                                  headers={"Content-Type": "application/json",
