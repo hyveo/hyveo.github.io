@@ -3,6 +3,8 @@ name: 아침 다운로드 리포트
 on:
   schedule:
     - cron: "50 23 * * *"   # 매일 08:50 KST (GitHub 지연을 감안해 9시 전후 도착)
+    - cron: "37 0 * * *"    # 09:37 KST 예비 (위 실행이 누락됐을 때만 동작)
+    - cron: "17 2 * * *"    # 11:17 KST 예비
   workflow_dispatch:
 
 permissions:
@@ -19,12 +21,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: 예비 실행 확인 (최근 6시간 안에 기록이 있으면 건너뜀)
+        id: guard
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import datetime as dt, json, os
+          h = json.load(open("public/addons/downloads.json", encoding="utf-8"))["history"]
+          last = dt.datetime.fromisoformat(h[-1]["at"])
+          age = dt.datetime.now(dt.timezone.utc) - last
+          skip = os.environ.get("GITHUB_EVENT_NAME") == "schedule" and age < dt.timedelta(hours=6)
+          print("skip=" + ("true" if skip else "false"))
+          PY
+
       - name: CurseForge 숫자 읽어서 기록
+        if: steps.guard.outputs.skip != 'true'
         env:
           CF_CORE_API_KEY: ${{ secrets.CF_CORE_API_KEY }}
         run: python3 .github/scripts/cloud_downloads.py record
 
       - name: 커밋 & 푸시
+        if: steps.guard.outputs.skip != 'true'
         run: |
           git config user.name hyveo
           git config user.email 296134232+hyveo@users.noreply.github.com
@@ -33,16 +49,19 @@ jobs:
           git push
 
       - name: 공개 디스코드 알림
+        if: steps.guard.outputs.skip != 'true'
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: python3 .github/scripts/discord_downloads.py
 
       - name: Dashboard 디스코드 리포트
+        if: steps.guard.outputs.skip != 'true'
         env:
           DISCORD_DASHBOARD_WEBHOOK_URL: ${{ secrets.DISCORD_DASHBOARD_WEBHOOK_URL }}
         run: python3 .github/scripts/cloud_downloads.py dashboard
 
       - name: 허브 사이트 다시 배포
+        if: steps.guard.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run pages.yml --ref main
