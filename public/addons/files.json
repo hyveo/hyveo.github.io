@@ -1,9 +1,9 @@
 {
-  "updated": "2026-11-25T16:43+09:00",
+  "updated": "2026-11-26T13:42+09:00",
   "files": {
     "centerbar": {
       "1.7.2": {
-        "type": "B",
+        "type": "R",
         "uploaded": "2026-11-25 03:36",
         "size": 43244,
         "file": "CenterBar-1.7.2.zip"
@@ -71,7 +71,7 @@
     },
     "levelpace": {
       "1.2.0": {
-        "type": "B",
+        "type": "R",
         "uploaded": "2026-11-25 01:27",
         "size": 27497,
         "file": "LevelPace-1.2.0.zip"
@@ -103,7 +103,7 @@
     },
     "hyveo-center": {
       "1.1.0": {
-        "type": "B",
+        "type": "R",
         "uploaded": "2026-11-25 01:28",
         "size": 27288,
         "file": "HyveoCenter-1.1.0.zip"
