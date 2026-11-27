@@ -155,11 +155,9 @@ def comment_field(names):
         info = json.load(open("/tmp/new_comments.json", encoding="utf-8"))
     except (OSError, ValueError):
         return None
-    if not info["ok"] and not info["totals"]:
-        return {"name": "💬 댓글", "value": "댓글을 읽지 못했어요", "inline": False}
+    if not info["new"]:  # 새 댓글이 있을 때만 칸을 보여준다
+        return None
     total = " · ".join(f"{names[k]} {n}" for k, n in info["totals"].items())
-    if not info["new"]:
-        return {"name": "💬 댓글", "value": f"새 댓글 없음 (총 {total})", "inline": False}
     rows = []
     for c in info["new"][:8]:
         when = c["at"][:10]
