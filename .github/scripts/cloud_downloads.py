@@ -14,6 +14,7 @@ import urllib.request
 PROJECTS = {"centerbar": 1814948, "levelpace": 1814884, "hyveo-center": 1814965}
 PATH = "public/addons/downloads.json"
 FILES_PATH = "public/addons/files.json"
+COMMENTS_PATH = "public/addons/comments.json"  # 본 댓글 id만 저장 (내용은 저장하지 않음)
 TYPE_KO = {"R": "[R]", "B": "[B]", "A": "[A]"}
 
 
@@ -87,6 +88,86 @@ def site_files(pid):
         page += 1
 
 
+def site_get(path):
+    req = urllib.request.Request("https://www.curseforge.com" + path,
+                                 headers={"Accept": "application/json", "User-Agent": "hyveo-addons-bot (https://hyveo.github.io)"})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.load(r)
+
+
+def _walk(items):
+    for c in items or []:
+        yield c
+        for key in ("replies", "children", "comments"):
+            if isinstance(c.get(key), list):
+                yield from _walk(c[key])
+
+
+def _text(c):
+    for key in ("body", "comment", "content", "message", "text"):
+        v = c.get(key)
+        if isinstance(v, str) and v.strip():
+            return " ".join(v.split())
+    return json.dumps(c, ensure_ascii=False)[:300]
+
+
+def _author(c):
+    u = c.get("user") or c.get("author") or {}
+    if isinstance(u, dict):
+        return u.get("username") or u.get("displayName") or u.get("name") or "?"
+    return str(u) or "?"
+
+
+def read_comments():
+    """공개 댓글 API로 새 댓글을 찾는다. 본 id는 comments.json에 저장(내용 제외), 새 댓글은 /tmp/new_comments.json."""
+    try:
+        seen = json.load(open(COMMENTS_PATH, encoding="utf-8")).get("seen", {})
+    except (OSError, ValueError):
+        seen = {}
+    new, totals, ok = [], {}, True
+    for slug, pid in PROJECTS.items():
+        try:
+            data = site_get(f"/api/v1/mods/{pid}/comments?pageIndex=0&pageSize=50")
+            items = list(_walk(data.get("data")))
+            totals[slug] = data.get("pagination", {}).get("totalCount", len(items))
+        except Exception as e:  # noqa: BLE001
+            print("댓글 읽기 실패:", slug, e)
+            ok = False
+            continue
+        ids = [str(c.get("id")) for c in items if c.get("id") is not None]
+        first_run = slug not in seen
+        for c in items:
+            cid = str(c.get("id"))
+            if cid not in seen.get(slug, []) and not first_run:
+                new.append({"slug": slug, "author": _author(c), "text": _text(c)[:300],
+                            "at": str(c.get("dateCreated") or c.get("createdAt") or "")})
+        seen[slug] = sorted(set(seen.get(slug, [])) | set(ids))
+        if first_run and items:  # 첫 실행에 이미 있던 댓글도 새 댓글로 보여줌
+            new += [{"slug": slug, "author": _author(c), "text": _text(c)[:300],
+                     "at": str(c.get("dateCreated") or c.get("createdAt") or "")} for c in items]
+    json.dump({"updated": dt.datetime.now(KST).strftime("%Y-%m-%dT%H:%M+09:00"), "seen": seen, "totals": totals},
+              open(COMMENTS_PATH, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    json.dump({"new": new, "totals": totals, "ok": ok}, open("/tmp/new_comments.json", "w", encoding="utf-8"), ensure_ascii=False)
+
+
+def comment_field(names):
+    try:
+        info = json.load(open("/tmp/new_comments.json", encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    if not info["ok"] and not info["totals"]:
+        return {"name": "💬 댓글", "value": "댓글을 읽지 못했어요", "inline": False}
+    total = " · ".join(f"{names[k]} {n}" for k, n in info["totals"].items())
+    if not info["new"]:
+        return {"name": "💬 댓글", "value": f"새 댓글 없음 (총 {total})", "inline": False}
+    rows = []
+    for c in info["new"][:8]:
+        when = c["at"][:10]
+        rows.append(f"**{names.get(c['slug'], c['slug'])}** · {c['author']}" + (f" · {when}" if when else "") + f"\n> {c['text']}")
+    more = f"\n…외 {len(info['new']) - 8}개" if len(info["new"]) > 8 else ""
+    return {"name": f"💬 새 댓글 {len(info['new'])}개 (총 {total})", "value": ("\n".join(rows) + more)[:1024], "inline": False}
+
+
 def read_counts():
     # 합계는 Core API, 버전별 숫자는 curseforge.com 공개 파일 목록에서 읽는다.
     # (Core API·CFWidget의 파일별 숫자는 갱신이 며칠씩 늦어 쓰지 않는다)
@@ -110,6 +191,10 @@ def read_counts():
         print("버전별 숫자 읽기 실패, 합계만 기록:", e)
         latest = {}
     json.dump(latest, open("/tmp/latest.json", "w"), ensure_ascii=False)
+    try:
+        read_comments()
+    except Exception as e:  # noqa: BLE001  댓글 때문에 기록이 실패하면 안 됨
+        print("댓글 확인 실패:", e)
     return entry, set()
 
 
@@ -157,7 +242,7 @@ def dashboard(h, betas):
         "title": f"📦 CurseForge 다운로드 · {last['at'][:10]} {last['at'][11:16]}",
         "url": "https://hyveo.github.io/addons/", "color": 0x3FB950,
         "description": desc,
-        "fields": version_fields(h, names),
+        "fields": version_fields(h, names) + ([cf] if (cf := comment_field(names)) else []),
         "footer": {"text": "참조 API: 합계 = CurseForge Core API (GET https://api.curseforge.com/v1/mods/{id}) · 버전별 = curseforge.com 공개 파일 목록 (GET https://www.curseforge.com/api/v1/mods/{id}/files)\n(+n)은 이전 버전별 기록과 비교 · 리워드 포인트는 채팅에서 조회할 때 확인돼요"}}]}
     req = urllib.request.Request(hook + ("&" if "?" in hook else "?") + "wait=true",
                                  data=json.dumps(payload).encode("utf-8"),
