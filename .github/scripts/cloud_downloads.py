@@ -48,7 +48,8 @@ def version_fields(h, names):
     last = h[-1]
     vers = last.get("versions")
     latest = json.load(open("/tmp/latest.json")) if os.path.exists("/tmp/latest.json") else {}
-    pv = next((r["versions"] for r in reversed(h[:-1]) if r.get("versions")), {})
+    today = last["at"][:10]
+    pv = next((r["versions"] for r in reversed(h[:-1]) if r["at"][:10] < today and r.get("versions")), {})
     meta = json.load(open(FILES_PATH, encoding="utf-8")).get("files", {}) if os.path.exists(FILES_PATH) else {}
     fields = []
     for k, name in names.items():
@@ -136,11 +137,12 @@ def dashboard(h, betas):
     d = json.load(open(PATH, encoding="utf-8"))
     names = {"centerbar": "센터바", "levelpace": "레벨페이스", "hyveo-center": "애드온 센터"}
     h = d["history"]
-    last, prev = h[-1], h[-2]
+    last = h[-1]
+    prev, _ = base_for(h, last["at"][:10])  # 오늘 00시 이전 마지막 기록
     tot = lambda r: sum(r.get(k, 0) for k in names)
     sign = lambda n: f"+{n}" if n >= 0 else str(n)
     head = " · ".join(f"{names[k]} {last[k]} ({sign(last[k] - prev.get(k, 0))})" for k in names)
-    desc = f"**{head} · 합계 {tot(last)} ({sign(tot(last) - tot(prev))})**\n(비교 기준: {prev['at'][:10]} {prev['at'][11:16]} 기록)\n"
+    desc = f"**{head} · 합계 {tot(last)} ({sign(tot(last) - tot(prev))})**\n(오늘 00시부터 누적 · 기준: {prev['at'][5:10].replace('-', '/')} {prev['at'][11:16]} 기록)\n" if prev else f"**{head} · 합계 {tot(last)}** _(첫 배포부터)_\n"
     today = last["at"][:10]
     d0 = dt.date.fromisoformat(today)
     mon = (d0 - dt.timedelta(days=d0.weekday())).isoformat()

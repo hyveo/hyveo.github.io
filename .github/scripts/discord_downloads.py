@@ -53,7 +53,7 @@ def total(r):
 fields = []
 for k, name in names.items():
     cnt = last.get(k, 0)
-    head = f"{name} — {cnt:,}회" + change(cnt, prev.get(k) if prev else None)
+    head = f"{name} — {cnt:,}회" + change(cnt, day0.get(k, 0) if day0 else 0)
     v = (last.get("versions") or {}).get(k)
     pvr = next((r for r in reversed(h[:-1]) if r.get("versions")), None)
     pv = ((pvr or {}).get("versions") or {}).get(k)
@@ -63,8 +63,6 @@ for k, name in names.items():
         for ver in pick_versions(v, META.get(k, {})):
             n = v[ver]
             bits = []
-            if pv is not None and pvr is not day0v and n - pv.get(ver, 0) > 0:
-                bits.append(f"+{n - pv.get(ver, 0)}")
             if dv is not None and n - dv.get(ver, 0) > 0:
                 bits.append(f"오늘 +{n - dv.get(ver, 0)}")
             m = META.get(k, {}).get(ver, {})
@@ -76,7 +74,7 @@ for k, name in names.items():
     fields.append({"name": head, "value": value, "inline": True})
 
 t = total(last)
-desc = f"전체 **{t:,}회**" + change(t, total(prev) if prev else None)
+desc = f"전체 **{t:,}회**" + change(t, total(day0) if day0 else 0) + " · 오늘 00시부터 누적"
 import datetime as _dt
 
 
