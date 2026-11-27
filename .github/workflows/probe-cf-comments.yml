@@ -1,0 +1,19 @@
+name: probe curseforge comments
+on: workflow_dispatch
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          python3 - <<'PY'
+          import urllib.request
+          for slug in ["centerbar", "levelpace", "hyveo-addon-center"]:
+              try:
+                  req = urllib.request.Request(f"https://www.curseforge.com/wow/addons/{slug}/comments",
+                      headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36", "Accept": "text/html"})
+                  with urllib.request.urlopen(req, timeout=30) as r:
+                      b = r.read().decode("utf-8", "replace")
+                  print("OK", slug, r.status, len(b), "Break the silence" in b)
+              except Exception as e:
+                  print("FAIL", slug, repr(e)[:200])
+          PY
